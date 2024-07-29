@@ -6,18 +6,21 @@ if (isset($_POST['studentId']) && isset($_POST['studentName'])) {
     $studentName = $_POST['studentName'];
     $qrText = "Student ID: " . $studentId . "\nName: " . $studentName;
 
-    $filePath = 'qrcodes/' . $studentId . '.png';
+    // Extract first and last name
+    $nameParts = explode(' ', $studentName);
+    $firstName = $nameParts[0];
+    $lastName = end($nameParts); 
+    $fileName = $firstName . '_' . $lastName . '.png';
+    $filePath = 'qrcodes/' . $fileName;
 
-    // Ensure the directory exists
     if (!file_exists('qrcodes')) {
         mkdir('qrcodes', 0777, true);
     }
 
     QRcode::png($qrText, $filePath);
 
-    // Check if the file was created successfully
     if (file_exists($filePath)) {
-        echo json_encode(['success' => true, 'qrCodeUrl' => $filePath]);
+        echo json_encode(['success' => true, 'qrCodeUrl' => $filePath, 'fileName' => $fileName]);
     } else {
         echo json_encode(['success' => false, 'error' => 'QR code generation failed']);
     }

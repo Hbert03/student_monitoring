@@ -1,84 +1,94 @@
-function generateQRCode(studentId, studentName) {
-    $.ajax({
-      type: 'POST',
-      url: 'generate.php',
-      data: { studentId: studentId, studentName: studentName },
-      success: function(response) {
-        // Parse the JSON response
-        try {
-          response = JSON.parse(response);
-        } catch (e) {
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to parse JSON response: ' + e,
-            icon: 'error'
-          });
-          return;
-        }
-  
-        if (response.success) {
-          $('#qrCodeContainer').html('<img id="qrCodeImage" src="' + response.qrCodeUrl + '" alt="QR Code">');
-          $('#downloadLink').attr('href', response.qrCodeUrl);
-          $('#downloadLink').show();
-        } else {
-          Swal.fire({
-            title: 'Error!',
-            text: 'There was an error generating the QR code: ' + (response.error || 'Unknown error'),
-            icon: 'error'
-          });
-        }
-      },
-      error: function(xhr, status, error) {
-        Swal.fire({
-          title: 'Error!',
-          text: 'AJAX error: ' + error,
-          icon: 'error'
-        });
-      }
-    });
-  }
-  
-  $(document).ready(function() {
-    $("button.btn1").on("click", function(event) {
+$(document).ready(function() {
+  $("button.btn1").on("click", function(event) {
       event.preventDefault();
-  
-      $("input").removeClass("invalid");
-  
-      let isValid = true;
-  
-      $("#addStudentForm").find("input[required], select[required]").each(function() {
-        if ($(this).val() === "") {
-          $(this).addClass("invalid");
-          isValid = false;
-        }
-      });
-  
-      if (isValid) {
-        $.ajax({
-          url: "function.php",
-          type: "POST",
-          data: $("#addStudentForm").serialize() + "&save=true",
-          success: function(response) {
-            response = JSON.parse(response);
-            if (response.success) {
-              Swal.fire({
-                icon: "success",
-                title: "Form Submitted",
-                showConfirmButton: true
-              }).then(() => {
-                generateQRCode(response.studentId, response.studentName);
-              });
-            } else {
-              toastr.error("Verify your Entry: " + response.error);
-            }
+
+      var requiredFilled = true;
+      $("#addStudentForm input, #addStudentForm select").each(function() {
+          if ($(this).prop("required") && $(this).val() === "") {
+              requiredFilled = false;
+              $(this).addClass("is-invalid");
+          } else {
+              $(this).removeClass("is-invalid");
           }
-        });
+      });
+
+      if (requiredFilled) {
+          $.ajax({
+              url: "function.php",
+              type: "POST",
+              data: $("#addStudentForm").serialize() + "&save=true",
+              success: function(response) {
+                  try {
+                      response = JSON.parse(response);
+                  } catch (e) {
+                      Swal.fire({
+                          title: "Error!",
+                          text: "Failed to parse JSON response: " + e,
+                          icon: "error"
+                      });
+                      return;
+                  }
+
+                  if (response.success) {
+                      Swal.fire({
+                          icon: "success",
+                          title: "Form Submitted",
+                          showConfirmButton: true
+                      }).then(() => {
+                          generateQRCode(response.studentId, response.studentName);
+                      });
+                  } else if (response.error === "Student already exists") {
+                      toastr.error("This student already exists. Please check the details and try again.");
+                  } else {
+                      toastr.error("Verify your Entry: " + response.error);
+                  }
+              }
+          });
       } else {
-        toastr.error("Please fill out all required fields.");
+          toastr.error("Please fill out all required fields.");
       }
-    });
   });
-  
+
+  function generateQRCode(studentId, studentName) {
+      $.ajax({
+          type: "POST",
+          url: "generate.php",
+          data: { studentId: studentId, studentName: studentName },
+          success: function(response) {
+              try {
+                  response = JSON.parse(response);
+              } catch (e) {
+                  Swal.fire({
+                      title: "Error!",
+                      text: "Failed to parse JSON response: " + e,
+                      icon: "error"
+                  });
+                  return;
+              }
+
+              if (response.success) {
+                  $('#qrCodeContainer').html('<img id="qrCodeImage" src="' + response.qrCodeUrl + '" alt="QR Code">');
+                  $('#downloadLink').attr('href', response.qrCodeUrl);
+                  $('#downloadLink').attr('download', response.fileName);
+                  $('#downloadLink').show();
+              } else {
+                  Swal.fire({
+                      title: "Error!",
+                      text: "There was an error generating the QR code: " + (response.error || "Unknown error"),
+                      icon: "error"
+                  });
+              }
+          },
+          error: function(xhr, status, error) {
+              Swal.fire({
+                  title: "Error!",
+                  text: "AJAX error: " + error,
+                  icon: "error"
+              });
+          }
+      });
+  }
+});
 
 
 

@@ -1,3 +1,4 @@
-input.invalid{
-    border-color: 1px red;
+.is-invalid {
+    border: .2px solid red;
 }
+

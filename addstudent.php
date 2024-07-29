@@ -77,51 +77,51 @@ include ('header.php');
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="parentname">Parent Name</label>
-            <input type="text" class="form-control" id="parentname" name="parentname">
+            <input type="text" class="form-control" id="parentname" name="parentname" placeholder="Fullname" required>
           </div>
           <div class="form-group col-md-6">
             <label for="mobilenumber">Mobile Number</label>
-            <input type="text" class="form-control" id="mobilenumber" name="mobilenumber">
+            <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" placeholder="Mobile Number" required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="address">Address</label>
-            <input type="text" class="form-control" id="address" name="address">
+            <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
           </div>
           <div class="form-group col-md-6">
-            <label for="firstname">Firstname</label>
-            <input type="text" class="form-control" id="firstname" name="firstname">
+            <label for="firstname">Student Firstname</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstnamae" required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="middlename">Middlename</label>
-            <input type="text" class="form-control" id="middlename" name="middlename">
+            <label for="middlename">Student Middlename</label>
+            <input type="text" class="form-control" id="middlename" name="middlename" placeholder="Middlename" required>
           </div>
           <div class="form-group col-md-6">
-            <label for="lastname">Lastname</label>
-            <input type="text" class="form-control" id="lastname" name="lastname">
+            <label for="lastname"> Student Lastname</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Lastname" required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="studentmobile">Student Mobile</label>
-            <input type="text" class="form-control" id="studentmobile" name="studentmobile">
+            <input type="text" class="form-control" id="studentmobile" name="studentmobile" placeholder="Mobile Number" required>
           </div>
           <div class="form-group col-md-6">
             <label for="studentaddress">Student Address</label>
-            <input type="text" class="form-control" id="studentaddress" name="studentaddress">
+            <input type="text" class="form-control" id="studentaddress" name="studentaddress" placeholder="Address" required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="status">Status</label>
-            <input type="text" class="form-control" id="status" name="status">
+            <input type="text" class="form-control" id="status" name="status" placeholder="" required>
           </div>
           <div class="form-group col-md-6">
             <label for="grade">Grade Level</label>
-            <select class="form-control gradelevel" id="grade" name="grade">
+            <select class="form-control gradelevel" id="grade" name="grade" required>
             </select>
           </div>
         </div>
