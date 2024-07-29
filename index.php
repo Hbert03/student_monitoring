@@ -5,6 +5,12 @@ include ('class.php');
 $elems = new Elementary();
 $totalElems = $elems->getValue("totalElems");
 
+$junior = new Junior_High();
+$totalJunior = $junior->getValue("totalJunior");
+
+
+$senior = new Senior_High();
+$totalSenior = $senior->getValue("totalSenior");
 ?>
 
 
@@ -14,7 +20,7 @@ $totalElems = $elems->getValue("totalElems");
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
+    <a href="#" class="brand-link">
       <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">Admin</span>
     </a>
@@ -24,7 +30,7 @@ $totalElems = $elems->getValue("totalElems");
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+          <img src="img/admin.png" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
           <a href="#" class="d-block">Admin</a>
@@ -86,7 +92,7 @@ $totalElems = $elems->getValue("totalElems");
         <div class="row">
           <div class="col-lg-4 col-6">
             <!-- small box -->
-            <div class="small-box bg-info">
+            <div class="small-box bg-primary">
               <div class="inner">
                 <h3><?php echo $totalElems; ?></h3>
 
@@ -101,9 +107,9 @@ $totalElems = $elems->getValue("totalElems");
           <!-- ./col -->
           <div class="col-lg-4 col-6">
             <!-- small box -->
-            <div class="small-box bg-success">
+            <div class="small-box bg-info">
               <div class="inner">
-                <h3>53<sup style="font-size: 20px">%</sup></h3>
+                <h3><?php echo $totalJunior ?></h3>
 
                 <p>JUNIOR HIGH SCHOOL</p>
               </div>
@@ -116,9 +122,9 @@ $totalElems = $elems->getValue("totalElems");
           <!-- ./col -->
           <div class="col-lg-4 col-6">
             <!-- small box -->
-            <div class="small-box bg-warning">
+            <div class="small-box bg-primary">
               <div class="inner">
-                <h3>44</h3>
+                <h3><?php echo $totalSenior ?></h3>
 
                 <p>SENIOR HIGH SCHOOL</p>
               </div>
@@ -135,28 +141,50 @@ $totalElems = $elems->getValue("totalElems");
         <!-- /.row -->
         <!-- Main row -->
         <div class="row">
-          <!-- Left col -->
-          <div class="col-lg-7 connectedSortable">
-            <!-- Custom tabs (Charts with tabs)-->
+          <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">
-                  <i class="fas fa-chart-pie mr-1"></i>
-                  Sales
-                </h3>
+                <h5 class="card-title">Number of Enrolled in Current Year</h5>
+
                 <div class="card-tools">
-                  <ul class="nav nav-pills ml-auto">
-                    <li class="nav-item">
-                      <a class="nav-link active" href="#revenue-chart" data-toggle="tab">Area</a>
-                    </li>
-                    <!-- <li class="nav-item">
-                      <a class="nav-link" href="#sales-chart" data-toggle="tab">Donut</a>
-                    </li> -->
-                  </ul>
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
                 </div>
               </div>
-              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
               
+                  <div class="col-md-12">
+                     <p class="text-center">
+                      <strong></strong>
+                         </p>
+
+                       <div class="chart" style="width:100%;">
+                       <!-- Sales Chart Canvas -->
+                         <canvas id="graphchart" height="70"></canvas>
+                        </div>
+                      </div>
+     
+                    </div>
+ 
+                 </div>
+                </div>
+                <!-- /.row -->
+              </div>
+              <!-- ./card-body -->
+           
+              <!-- /.card-footer -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
 
           
 </div>
