@@ -123,3 +123,20 @@ $(document).ready(function() {
     allowClear: true
   })
   })
+
+
+
+    
+  document.addEventListener('DOMContentLoaded', function () {
+    var currentLocation = location.href;
+    var menuItem = document.querySelectorAll('#sidebarNav .nav-link');
+    var menuLength = menuItem.length;
+    for (var i = 0; i < menuLength; i++) {
+      if (menuItem[i].href === currentLocation) {
+        menuItem[i].classList.add('active');
+        if (menuItem[i].closest('.nav-treeview')) {
+          menuItem[i].closest('.nav-treeview').parentNode.querySelector('.nav-link').classList.add('active');
+        }
+      }
+    }
+  });

@@ -11,7 +11,7 @@ include ('header.php');
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Add Student</h1>
+          <h1 class="m-0">Add Teacher</h1>
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -29,46 +29,20 @@ include ('header.php');
       <form id="addStudentForm">
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="parentname">Parent Name</label>
-            <input type="text" class="form-control" id="parentname" name="parentname" placeholder="Fullname" required>
+            <label for="fullname">Fullname</label>
+            <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Name" required>
           </div>
-          <div class="form-group col-md-6">
-            <label for="mobilenumber">Mobile Number</label>
-            <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" placeholder="Mobile Number" required>
-          </div>
-        </div>
-        <div class="form-row">
           <div class="form-group col-md-6">
             <label for="address">Address</label>
             <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
           </div>
-          <div class="form-group col-md-6">
-            <label for="firstname">Student Firstname</label>
-            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname" required>
-          </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="middlename">Student Middlename</label>
-            <input type="text" class="form-control" id="middlename" name="middlename" placeholder="Middlename" required>
+            <label for="mobile_num">Mobile Number</label>
+            <input type="text" class="form-control" id="mobile_num" name="mobile_num" placeholder="Mobile Number" required>
           </div>
           <div class="form-group col-md-6">
-            <label for="lastname"> Student Lastname</label>
-            <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Lastname" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="studentmobile">Student Mobile</label>
-            <input type="text" class="form-control" id="studentmobile" name="studentmobile" placeholder="Mobile Number" required>
-          </div>
-          <div class="form-group col-md-6">
-            <label for="studentaddress">Student Address</label>
-            <input type="text" class="form-control" id="studentaddress" name="studentaddress" placeholder="Address" required>
-          </div>
-        </div>
-        <div class="form-row">
-        <div class="form-group col-md-6">
           <label for="status">Status</label>
              <select class="form-control" id="status" name="status" required>
                   <option value="" disabled selected>Select your status</option>
@@ -79,14 +53,9 @@ include ('header.php');
                   <option value="separated">Separated</option>
              </select>
           </div>
-          <div class="form-group col-md-6">
-            <label for="grade">Grade Level</label>
-            <select class="form-control gradelevel" id="grade" name="grade" required>
-            </select>
-          </div>
         </div>
         <div class="text-center">
-          <button type="submit" class="btn1">Save</button>
+          <button type="submit" class="btn btn-primary btn2">Save</button>
         </div>
       </form>
       <div id="qrCodeContainer" class="text-center mt-3"></div>
