@@ -37,7 +37,7 @@ function updateChart(data) {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'NUMBER OF DATA OF THE MONTH',
+                    label: 'NUMBER OF ENROLLED STUDENT',
                     data: values,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',

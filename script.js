@@ -32,7 +32,7 @@ $(document).ready(function() {
                   if (response.success) {
                       Swal.fire({
                           icon: "success",
-                          title: "Form Submitted",
+                          title: "Student Successfully Saved!",
                           showConfirmButton: true
                       }).then(() => {
                           generateQRCode(response.studentId, response.studentName);
@@ -140,3 +140,447 @@ $(document).ready(function() {
       }
     }
   });
+
+  $("button.add_school_year").on("click", function() {
+    Swal.fire({
+        title: "Add School Year",
+        html: "<input type='text' id='schoolYear' placeholder='School year' class='swal2-input'>",
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Save',
+        preConfirm: () => {
+            const schoolYear = Swal.getPopup().querySelector('#schoolYear').value;
+            if (!schoolYear) {
+                Swal.showValidationMessage(`Please enter the school year`);
+                return false;
+            }
+            return { schoolYear: schoolYear };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: 'function.php',
+                type: 'POST',
+                data: { addschoolyear: true, school_year: result.value.schoolYear },
+                success: function(response) {
+                    try {
+                        response = JSON.parse(response);
+                    } catch (e) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to parse JSON response: ' + e
+                        });
+                        return;
+                    }
+
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'School Year Saved',
+                            text: 'The school year has been added successfully.'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.error
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to save school year'
+                    });
+                }
+            });
+        }
+    });
+});
+
+
+//add subject
+$("button.add_subject").on("click", function() {
+    Swal.fire({
+        title: "Add Subject",
+        html: "<input type='text' id='subject' placeholder='Subject Name' class='swal2-input'>",
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Save',
+        preConfirm: () => {
+            const subject = Swal.getPopup().querySelector('#subject').value;
+            if (!subject) {
+                Swal.showValidationMessage(`Please enter the school year`);
+                return false;
+            }
+            return { subject: subject };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: 'function.php',
+                type: 'POST',
+                data: { addsubject: true, subject: result.value.subject },
+                success: function(response) {
+                    try {
+                        response = JSON.parse(response);
+                    } catch (e) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to parse JSON response: ' + e
+                        });
+                        return;
+                    }
+
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'School Year Saved',
+                            text: 'The school year has been added successfully.'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.error
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to save school year'
+                    });
+                }
+            });
+        }
+    });
+});
+
+
+
+  $(document).ready(function() {
+    $("button.btn2").on("click", function(event) {
+        event.preventDefault();
+  
+        var requiredFilled = true;
+        $("#addteacherForm input, #addteacherForm select").each(function() {
+            if ($(this).prop("required") && $(this).val() === "") {
+                requiredFilled = false;
+                $(this).addClass("is-invalid");
+            } else {
+                $(this).removeClass("is-invalid");
+            }
+        });
+  
+        if (requiredFilled) {
+            $.ajax({
+                url: "function.php",
+                type: "POST",
+                data: $("#addteacherForm").serialize() + "&save_teacher=true",
+                success: function(response) {
+                    try {
+                        response = JSON.parse(response);
+                    } catch (e) {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Failed to parse JSON response: " + e,
+                            icon: "error"
+                        });
+                        return;
+                    }
+  
+                    if (response.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Teacher Saved!",
+                            showConfirmButton: true
+                        }).then(() => {
+                            generateQRCode(response.studentId, response.studentName);
+                        });
+                    }
+                    else {
+                        toastr.error("Verify your Entry: ");
+                    }
+                }
+            });
+        } else {
+            toastr.error("Please fill out all required fields.");
+        }
+    });
+  })  
+
+
+  
+$(document).ready(function() {
+    $('select.grade_level1').select2({
+      theme: "bootstrap4",
+      placeholder: 'Select Grade level',
+      ajax: {
+          url: 'select_fetch.php',
+          type: 'post',
+          dataType: "json",
+          delay: 250, 
+          data: function(params) {
+              return {
+                  gradelevel: true,
+                  term: params.term
+              };
+          },
+          processResults: function(data) {
+              return {
+                  results: $.map(data.results, function(grade) {
+                      return {
+                          id: grade.grade_level,
+                          text: grade.grade_level_name
+                      };
+                  })
+              };
+          },
+          cache: true
+      },
+      minimumInputLength: 0,
+      allowClear: true
+    })
+    })
+
+
+    //subject
+    $(document).ready(function() {
+        $('select.subject').select2({
+          theme: "bootstrap4",
+          placeholder: 'Select Subject',
+          ajax: {
+              url: 'select_fetch.php',
+              type: 'post',
+              dataType: "json",
+              delay: 250, 
+              data: function(params) {
+                  return {
+                      subject: true,
+                      term: params.term
+                  };
+              },
+              processResults: function(data) {
+                  return {
+                      results: $.map(data.results, function(grade) {
+                          return {
+                              id: grade.subject_id,
+                              text: grade.subject_name
+                          };
+                      })
+                  };
+              },
+              cache: true
+          },    
+          minimumInputLength: 0,
+          allowClear: true
+        })
+        })
+
+
+
+//teacher
+        $(document).ready(function() {
+            $('select.teacher').select2({
+              theme: "bootstrap4",
+              placeholder: 'Select Teacher',
+              ajax: {
+                  url: 'select_fetch.php',
+                  type: 'post',
+                  dataType: "json",
+                  delay: 250, 
+                  data: function(params) {
+                      return {
+                          teacher: true,
+                          term: params.term
+                      };
+                  },
+                  processResults: function(data) {
+                      return {
+                          results: $.map(data.results, function(grade) {
+                              return {
+                                  id: grade.teacher_id,
+                                  text: grade.teacher_name
+                              };
+                          })
+                      };
+                  },
+                  cache: true
+              },
+              minimumInputLength: 0,
+              allowClear: true
+            })
+            })
+
+            //section
+            $(document).ready(function() {
+                $('select.section').select2({
+                  theme: "bootstrap4",
+                  placeholder: 'Select Grade level',
+                  ajax: {
+                      url: 'select_fetch.php',
+                      type: 'post',
+                      dataType: "json",
+                      delay: 250, 
+                      data: function(params) {
+                          return {
+                              section: true,
+                              term: params.term
+                          };
+                      },
+                      processResults: function(data) {
+                          return {
+                              results: $.map(data.results, function(grade) {
+                                  return {
+                                      id: grade.section_id,
+                                      text: grade.section_name
+                                  };
+                              })
+                          };
+                      },
+                      cache: true
+                  },
+                  minimumInputLength: 0,
+                  allowClear: true
+                })
+                })
+
+                //schoolyear
+                $(document).ready(function() {
+                    $('select.school_year').select2({
+                      theme: "bootstrap4",
+                      placeholder: 'Select School Year',
+                      ajax: {
+                          url: 'select_fetch.php',
+                          type: 'post',
+                          dataType: "json",
+                          delay: 250, 
+                          data: function(params) {
+                              return {
+                                school_year: true,
+                                  term: params.term
+                              };
+                          },
+                          processResults: function(data) {
+                              return {
+                                  results: $.map(data.results, function(grade) {
+                                      return {
+                                          id: grade.school_year_id,
+                                          text: grade.school_year_name
+                                      };
+                                  })
+                              };
+                          },
+                          cache: true
+                      },
+                      minimumInputLength: 0,
+                      allowClear: true
+                    })
+                    })
+
+
+//add section
+    $(document).ready(function() {
+        $("button.btn3").on("click", function(event) {
+            event.preventDefault();
+      
+            var requiredFilled = true;
+            $("#addSectionForm input, #addSectionForm select").each(function() {
+                if ($(this).prop("required") && $(this).val() === "") {
+                    requiredFilled = false;
+                    $(this).addClass("is-invalid");
+                } else {
+                    $(this).removeClass("is-invalid");
+                }
+            });
+      
+            if (requiredFilled) {
+                $.ajax({
+                    url: "function.php",
+                    type: "POST",
+                    data: $("#addSectionForm").serialize() + "&addSection=true",
+                    success: function(response) {
+                        try {
+                            response = JSON.parse(response);
+                        } catch (e) {
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Failed",
+                                icon: "error"
+                            });
+                            return;
+                        }
+      
+                        if (response.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Section Save!",
+                                showConfirmButton: true
+                            })
+                        } 
+                         else {
+                            toastr.error("Verify your Entry: " + response.error);
+                        }
+                    }
+                });
+            } else {
+                toastr.error("Please fill out all required fields.");
+            }
+        });
+    });
+
+
+    //add class_sched
+    $(document).ready(function() {
+        $("button.btn4").on("click", function(event) {
+            event.preventDefault();
+      
+            var requiredFilled = true;
+            $("#addclassScheduleForm select").each(function() {
+                if ($(this).prop("required") && $(this).val() === "") {
+                    requiredFilled = false;
+                    $(this).addClass("is-invalid");
+                } else {
+                    $(this).removeClass("is-invalid");
+                }
+            });
+      
+            if (requiredFilled) {
+                $.ajax({
+                    url: "function.php",
+                    type: "POST",
+                    data: $("#addclassScheduleForm").serialize() + "&classSched=true",
+                    success: function(response) {
+                        try {
+                            response = JSON.parse(response);
+                        } catch (e) {
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Failed",
+                                icon: "error"
+                            });
+                            return;
+                        }
+      
+                        if (response.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Section Save!",
+                                showConfirmButton: true
+                            })
+                        } 
+                         else {
+                            toastr.error("Verify your Entry: " + response.error);
+                        }
+                    }
+                });
+            } else {
+                toastr.error("Please fill out all required fields.");
+            }
+        });
+    });

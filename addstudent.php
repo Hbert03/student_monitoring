@@ -89,11 +89,6 @@ include ('header.php');
           <button type="submit" class="btn1">Save</button>
         </div>
       </form>
-      <div id="qrCodeContainer" class="text-center mt-3"></div>
-      <div class="text-center mt-3">
-        <a id="downloadLink" href="#" download="qrcode.png" style="display:none;" class="btn btn-success">Download QR Code</a>
-      </div>
-    </div>
   </div>
 </section>
 </div>

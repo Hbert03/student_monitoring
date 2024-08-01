@@ -25,30 +25,79 @@ include ('header.php');
   <!-- Main content -->
   <section class="content">
   <div class="card">
+    <div class="card-header">
+      <button style="margin-left:1em" class="btn btn-primary float-right add_school_year"><span><i class="nav-icon fas fa-plus"></i></span>ADD SCHOOL YEAR</button>
+      <button class="btn btn-primary float-right add_subject"><span><i class="nav-icon fas fa-plus"></i></span>ADD SUBJECT</button>
+    </div>
     <div class="card-body">
-      <form id="addStudentForm">
+      <form id="addSectionForm">
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="fullname">Section Name</label>
-            <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Section Name" required>
+            <input type="text" class="form-control"  name="section" placeholder="Section Name" required>
           </div>
           <div class="form-group col-md-6">
-            <label for="address">Grade Level</label>
-            <select class="form-control"></select>
+            <label for="gradelevel">Grade Level</label>
+            <select class="form-control grade_level1" name="gradelevel"></select>
           </div>
         </div>
         <div class="text-center">
-          <button type="submit" class="btn btn-primary btn2">Save</button>
+          <button type="submit" class="btn btn-primary btn3">Save</button>
         </div>
       </form>
-      <div id="qrCodeContainer" class="text-center mt-3"></div>
-      <div class="text-center mt-3">
-        <a id="downloadLink" href="#" download="qrcode.png" style="display:none;" class="btn btn-success">Download QR Code</a>
-      </div>
-    </div>
+  </div>
+</section>
+
+<div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Add Class Schedule</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+          </ol>
+        </div><!-- /.col -->
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+<section class="content">
+  <div class="card">
+    <div class="card-body">
+      <form id="addclassScheduleForm">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="fullname">Subject</label>
+            <select class="form-control subject" name="subject"></select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="address">Teacher</label>
+            <select class="form-control teacher" name="teacher"></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="fullname">Section</label>
+            <select class="form-control section" name="section"></select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="address">School Year</label>
+            <select class="form-control school_year" name="school_year"></select>
+          </div>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn4">Save</button>
+        </div>
+      </form>
   </div>
 </section>
 </div>
+
+
+
+
+
 <!-- /.content-wrapper -->
 
 <?php include ('footer.php'); ?>

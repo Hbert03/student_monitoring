@@ -69,7 +69,7 @@
   <!-- Brand Logo -->
   <a href="#" class="brand-link">
       <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">Admin</span>
+      <span class="brand-text font-weight-light">Bonifacio NHS</span>
     </a>
 
     <!-- Sidebar -->
@@ -104,19 +104,19 @@
       <ul class="nav nav-treeview">
         <li class="nav-item">
           <a href="addstudent.php" class="nav-link">
-          <i class="fas fa-dot-circle"></i>
+          <i class="nav-icon fas fa-plus"></i>
             <p>Add Student</p>
           </a>
         </li>
         <li class="nav-item">
           <a href="addteacher.php" class="nav-link">
-          <i class="fas fa-dot-circle"></i>
+          <i class="nav-icon fas fa-plus"></i>
             <p>Add Teacher</p>
           </a>
         </li>
         <li class="nav-item">
           <a href="addsection.php" class="nav-link">
-          <i class="fas fa-dot-circle"></i>
+          <i class="nav-icon fas fa-plus"></i>
             <p>Add Section</p>
           </a>
         </li>
@@ -124,14 +124,20 @@
     </li>
     <li class="nav-item ">
       <a href="student.php" class="nav-link">
-        <i class="nav-icon fas fa-tachometer-alt"></i>
+      <i class="nav-icon fas fa-user-graduate"></i>
         <p>Students</p>
       </a>
     </li>
     <li class="nav-item ">
       <a href="teacher.php" class="nav-link">
-        <i class="nav-icon fas fa-tachometer-alt"></i>
+      <i class="nav-icon fas fa-chalkboard-teacher"></i>
         <p>Teacher</p>
+      </a>
+    </li>
+    <li class="nav-item ">
+      <a href="classsched.php" class="nav-link">
+      <i class="nav-icon fas fa-calendar-week"></i>
+        <p>Class Schedule</p>
       </a>
     </li>
   </ul>

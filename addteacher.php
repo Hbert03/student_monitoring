@@ -26,7 +26,7 @@ include ('header.php');
   <section class="content">
   <div class="card">
     <div class="card-body">
-      <form id="addStudentForm">
+      <form id="addteacherForm">
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="fullname">Fullname</label>
@@ -58,13 +58,10 @@ include ('header.php');
           <button type="submit" class="btn btn-primary btn2">Save</button>
         </div>
       </form>
-      <div id="qrCodeContainer" class="text-center mt-3"></div>
-      <div class="text-center mt-3">
-        <a id="downloadLink" href="#" download="qrcode.png" style="display:none;" class="btn btn-success">Download QR Code</a>
-      </div>
-    </div>
+  
   </div>
 </section>
+
 </div>
 <!-- /.content-wrapper -->
 

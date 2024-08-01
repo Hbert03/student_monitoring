@@ -62,4 +62,114 @@ if (isset($_POST['save'])) {
     $stmt->close();
     $conn->close();
 }
+
+if(isset($_POST['save_teacher'])) {
+    $fullname = $_POST['fullname'];
+    $address = $_POST['address'];
+    $mobile = $_POST['mobile_num'];
+    $status = $_POST['status'];
+
+    $query = "INSERT INTO teacher(teacher_name, teacher_address, teacher_mobile, teacher_status) 
+              VALUES (?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+
+    if($stmt) {
+        $stmt->bind_param("ssss", $fullname, $address, $mobile, $status);
+        if($stmt->execute()) {
+            echo json_encode(["success" => true]);
+        } else {
+            echo json_encode(["success" => false, "error" => $stmt->error]);
+        }
+        $stmt->close();
+    } else {
+        echo json_encode(["success" => false, "error" => $conn->error]);
+    }
+}
+
+
+if (isset($_POST['addschoolyear'])) {
+    $schoolyear = $_POST['school_year'];
+
+    $query = "INSERT INTO school_year (school_year_name) VALUES (?)";
+    $stmt = $conn->prepare($query);
+
+    if ($stmt) {
+        $stmt->bind_param("s", $schoolyear);
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "School year added successfully."]);
+        } else {
+            echo json_encode(["success" => false, "error" => $stmt->error]);
+        }
+        $stmt->close();
+    } else {
+        echo json_encode(["success" => false, "error" => $conn->error]);
+    }
+}
+
+
+//add subject
+if (isset($_POST['addsubject'])) {
+    $subject = $_POST['subject'];
+
+    $query = "INSERT INTO subject (subject_name) VALUES (?)";
+    $stmt = $conn->prepare($query);
+
+    if ($stmt) {
+        $stmt->bind_param("s", $subject);
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "Subject added successfully."]);
+        } else {
+            echo json_encode(["success" => false, "error" => $stmt->error]);
+        }
+        $stmt->close();
+    } else {
+        echo json_encode(["success" => false, "error" => $conn->error]);
+    }
+}
+
+ if(isset($_POST['addSection']))
+ {
+    $section = $_POST['section'];
+    $gradelevel = $_POST['gradelevel'];
+
+    $query = "INSERT INTO section(section_name, grade_level_id) VALUES (?,?)";
+
+    $stmt = $conn->prepare($query);
+
+    if($stmt)
+    {
+        $stmt->bind_param("ss", $section, $gradelevel);
+        if($stmt->execute()){
+            echo json_encode(["success" =>true]);
+        }else{
+            echo json_encode(["success" => false, "error" => $stmt->error]);
+        }
+        $stmt->close();
+    }
+ }
+
+
+ if(isset($_POST['classSched']))
+ {
+    $subject = $_POST['subject'];
+    $teacher = $_POST['teacher'];
+    $section = $_POST['section'];
+    $school_year = $_POST['school_year'];
+
+    $query = "INSERT INTO class_schedule(subject_id, teacher_id, section_id, school_year_id)
+    VALUES (?,?,?,?)";
+    $stmt = $conn->prepare($query);
+
+    if($stmt)
+    {
+        $stmt->bind_param("ssss", $subject, $teacher, $section, $school_year);
+        if($stmt->execute()){
+            echo json_encode(["success" => true]);
+        }else{
+            echo json_encode(["success" => false, "error" => $stmt->error]);
+        }
+        $stmt->close();
+    }
+ }
+
 ?>
