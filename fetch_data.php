@@ -163,4 +163,285 @@ if (isset($_POST['fetch_teacher'])) {
     echo getDataTable($draw, $start, $length, $search);    
     exit();
 }
+
+
+
+if (isset($_POST['fetch_classSched'])) {
+
+    function getDataTable($draw, $start, $length, $search) {
+        global $conn;
+
+        $sortableColumns = array('subject_name, teacher_name, section_name, school_year_name');
+        
+        $orderBy = $sortableColumns[0];
+        $orderDir = 'ASC';
+
+        if (isset($_POST['order'][0]['column']) && isset($_POST['order'][0]['dir'])) {
+            $columnIdx = intval($_POST['order'][0]['column']);
+            $orderDir = $_POST['order'][0]['dir'];
+
+            if (isset($sortableColumns[$columnIdx])) {
+                $orderBy = $sortableColumns[$columnIdx];
+            }
+        }
+
+        $query1 = "SELECT cs.class_schedule_id, su.subject_name, te.teacher_name, se.section_name, sc.school_year_name 
+        FROM class_schedule cs 
+        INNER JOIN subject su ON cs.subject_id = su.subject_id 
+        INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+        INNER JOIN section se ON cs.section_id = se.section_id 
+        INNER JOIN school_year sc ON cs.school_year_id = sc.school_year_id 
+        WHERE 1=1";
+
+
+        if (!empty($search)) {
+            $escapedSearch = $conn->real_escape_string($search);
+            $query1 .= " AND (subject_name LIKE '%$escapedSearch%' OR teacher_name LIKE '%$escapedSearch%' OR section_name LIKE '%$escapedSearch%' OR school_year_name LIKE '%$escapedSearch%')";
+        }
+        
+
+    
+        $query1 .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
+
+        $result1 = $conn->query($query1);
+
+        $totalQuery1 = "SELECT COUNT(*) AS total_count 
+        FROM class_schedule cs 
+        INNER JOIN subject su ON cs.subject_id = su.subject_id 
+        INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+        INNER JOIN section se ON cs.section_id = se.section_id 
+        INNER JOIN school_year sc ON cs.school_year_id = sc.school_year_id 
+        WHERE 1=1";
+
+
+        if (!empty($search)) {
+         $escapedSearch = $conn->real_escape_string($search);
+        $totalQuery1 .= " AND (subject_name LIKE '%$escapedSearch%' OR teacher_name LIKE '%$escapedSearch%' OR section_name LIKE '%$escapedSearch%' OR school_year_name LIKE '%$escapedSearch%')";
+        }
+        
+       
+
+
+        $totalResult1 = $conn->query($totalQuery1);
+        $totalRow1 = $totalResult1->fetch_assoc();
+        $totalRecords1 = $totalRow1['total_count'];
+
+        $data = array();
+        while ($row = $result1->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+       
+        $output = array(
+            "draw" => intval($draw),
+            "recordsTotal" => intval($totalRecords1),
+            "recordsFiltered" => intval($totalRecords1),
+            "data" => $data
+        );
+
+        return json_encode($output);
+    }
+
+    $draw = $_POST["draw"];
+    $start = $_POST["start"];
+    $length = $_POST["length"];
+    $search = $_POST["search"]["value"];
+
+    echo getDataTable($draw, $start, $length, $search);    
+    exit();
+}
+
+
+
+if (isset($_POST['getdata'])) {
+    $id = $_POST['class_schedule_id'];
+    $query = "SELECT cs.class_schedule_id, su.subject_name, te.teacher_name, se.section_name, sc.school_year_name 
+        FROM class_schedule cs 
+        INNER JOIN subject su ON cs.subject_id = su.subject_id 
+        INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+        INNER JOIN section se ON cs.section_id = se.section_id 
+        INNER JOIN school_year sc ON cs.school_year_id = sc.school_year_id 
+        WHERE cs.class_schedule_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id); 
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result) {
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    } else {
+        echo "Error executing query: " . $conn->error;
+    }
+    exit();
+}
+
+
+
+if (isset($_POST['update'])) {
+    $class_schedule_id = $_POST['class_schedule_id'];
+    $subject_id = $_POST['subject_id'];
+    $teacher_id = $_POST['teacher_id'];
+    $section_id = $_POST['section_id'];
+    $school_year_id = $_POST['school_year_id'];
+
+  
+    $query = "SELECT subject_id, teacher_id, section_id, school_year_id FROM class_schedule WHERE class_schedule_id = ?";
+    if ($stmt = mysqli_prepare($conn, $query)) {
+        mysqli_stmt_bind_param($stmt, "i", $class_schedule_id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_bind_result($stmt, $current_subject_id, $current_teacher_id, $current_section_id, $current_school_year_id);
+        mysqli_stmt_fetch($stmt);
+        mysqli_stmt_close($stmt);
+    } else {
+        echo "Failed to prepare the SQL statement.";
+        error_log("SQL Error: " . mysqli_error($conn));
+        exit;
+    }
+
+  
+    $subject_id = !empty($subject_id) ? $subject_id : $current_subject_id;
+    $teacher_id = !empty($teacher_id) ? $teacher_id : $current_teacher_id;
+    $section_id = !empty($section_id) ? $section_id : $current_section_id;
+    $school_year_id = !empty($school_year_id) ? $school_year_id : $current_school_year_id;
+
+    
+    $query = "UPDATE class_schedule
+              SET subject_id = ?, teacher_id = ?, section_id = ?, school_year_id = ?
+              WHERE class_schedule_id = ?";
+
+    if ($stmt = mysqli_prepare($conn, $query)) {
+        mysqli_stmt_bind_param($stmt, "iiiii", $subject_id, $teacher_id, $section_id, $school_year_id, $class_schedule_id);
+        if (mysqli_stmt_execute($stmt)) {
+            echo "Updated Successfully";
+        } else {
+            echo "Failed to update file in the database.";
+        }
+        mysqli_stmt_close($stmt);
+    } else {
+        echo "Failed to prepare the SQL statement.";
+        error_log("SQL Error: " . mysqli_error($conn));
+    }
+}
+
+if (isset($_POST['delete'])) { 
+    $class_schedule_id = $_POST['class_schedule_id'];
+    $query = "DELETE FROM class_schedule WHERE class_schedule_id = '$class_schedule_id'";
+    if (mysqli_query($conn, $query)) {
+        echo "Your data has been deleted."; 
+    } else {
+        echo "Failed to delete data."; 
+    }
+    exit();
+}
+
+
+if (isset($_POST['getdatastudent'])) {
+    $student_id = $_POST['student_id'];
+    $query = "SELECT * FROM student WHERE student_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $student_id); 
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result) {
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    } else {
+        echo "Error executing query: " . $conn->error;
+    }
+    exit();
+}
+
+
+if (isset($_POST['deletestudent'])) { 
+    $student_id = $_POST['student_id'];
+    $query = "DELETE FROM student WHERE student_id = '$student_id'";
+    if (mysqli_query($conn, $query)) {
+        echo "Your data has been deleted."; 
+    } else {
+        echo "Failed to delete data."; 
+    }
+    exit();
+}
+
+
+if (isset($_POST['updatestudent'])) {
+    $student_id = $_POST['student_id'];
+    $value1 = $_POST['student_firstname'];
+    $value2 = $_POST['student_middlename'];
+    $value3 = $_POST['student_lastname'];
+    $value4 = $_POST['student_address'];
+    $value5 = $_POST['student_status'];
+   
+
+    $query = "UPDATE student
+              SET student_firstname = '$value1', student_middlename = '$value2', student_lastname = '$value3', student_address = '$value4', student_status = '$value5'
+              WHERE student_id = '$student_id'";
+    if (mysqli_query($conn, $query)) {
+        echo "Updated Successfully";
+    } else {
+        echo "Failed to update file in the database.";
+    }
+}
+
+
+
+if (isset($_POST['getdatateacher'])) {
+    $teacher_id = $_POST['teacher_id'];
+    $query = "SELECT * FROM teacher WHERE teacher_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $teacher_id); 
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result) {
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    } else {
+        echo "Error executing query: " . $conn->error;
+    }
+    exit();
+}
+
+
+if (isset($_POST['deleteteacher'])) { 
+    $teacher_id = $_POST['teacher_id'];
+    $query = "DELETE FROM teacher WHERE teacher_id = '$teacher_id'";
+    if (mysqli_query($conn, $query)) {
+        echo "Your data has been deleted."; 
+    } else {
+        echo "Failed to delete data."; 
+    }
+    exit();
+}
+
+
+if (isset($_POST['updateteacher'])) {
+    $teacher_id = $_POST['teacher_id'];
+    $value1 = $_POST['teacher_name'];
+    $value2 = $_POST['teacher_address'];
+    $value3 = $_POST['teacher_mobile'];
+    $value4 = $_POST['teacher_status'];
+   
+
+    $query = "UPDATE teacher
+              SET teacher_name = '$value1', teacher_address = '$value2', teacher_mobile = '$value3', teacher_status = '$value4'
+              WHERE teacher_id = '$teacher_id'";
+    if (mysqli_query($conn, $query)) {
+        echo "Updated Successfully";
+    } else {
+        echo "Failed to update file in the database.";
+    }
+}
+
 ?>

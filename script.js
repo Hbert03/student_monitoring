@@ -755,15 +755,19 @@ $(document).ready(function() {
             },
             {"data": null,
                 "render": function(data, type, row){
-                    return "<button class='btn btn-info'>Edit</button>";
+                    return "<button class='btn btn-info edit' data-student='"+row.student_id+"'>Edit</button>";
                 }
             },
             {"data": null,
                 "render": function(data, type, row){
-                    return "<button class='btn btn-danger'>Delete</button>";
+                    return "<button class='btn btn-danger delete' data-student='"+ row.student_id+"'>Delete</button>";
                 }
             }
-        ]
+        ],
+        drawCallback: function(){
+            deletedstudent();
+            editstudent();
+        }
     });
 
    
@@ -771,6 +775,125 @@ $(document).ready(function() {
         table.draw();
     });
 });
+
+function deletedstudent(){
+    $('#student').on('click', 'button.delete', function(){
+        let student_id = $(this).data('student');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want to delete it?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'fetch_data.php',
+                            type: 'POST',
+                            data: {
+                                deletestudent: true,
+                                student_id: student_id
+                            },
+                            success: function(response) {
+                                if (response.trim() === "Your data has been deleted.") {
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'File has been deleted successfully.',
+                                        'success'
+                                    );
+                                    $('#student').DataTable().ajax.reload(null, false);
+                                } else {
+                                    Swal.fire(
+                                        'Failed!',
+                                        'Failed to delete file.',
+                                        'error'
+                                    );
+                                }
+                            },
+                        });
+                    }
+                });
+            });
+    }
+ 
+
+   function editstudent() {
+    $('#student').on('click', 'button.edit', function() {
+        let student_id = $(this).data('student');
+        $.ajax({
+            url: 'fetch_data.php',
+            type: 'POST',
+            data: {
+                getdatastudent: true,
+                student_id: student_id
+            },
+            success: function(response) {
+                if (response.trim() !== "") {
+                    var data = JSON.parse(response);
+                    Swal.fire({
+                        title: 'Student Details ',
+                        html: '<label>Firstname:</label>' +
+                              '<input id="swal-input1" class="form-control mb-2" value="' + data[0].student_firstname + '">' +
+                              '<label>Middlename:</label>' +
+                              '<input id="swal-input2" class="form-control mb-2" value="' + data[0].student_middlename + '">' +
+                              '<label>Lastname:</label>' +
+                              '<input id="swal-input3" class="form-control mb-2" value="' + data[0].student_lastname + '">' +
+                              '<label>Address:</label>' +
+                              '<input id="swal-input4" class="form-control mb-2" value="' + data[0].student_address + '">' +
+                              '<label>Status:</label>' +
+                              '<input id="swal-input5" class="form-control mb-2" value="' + data[0].student_status + '">',
+                        focusConfirm: false,
+                        confirmButtonText: 'Update',
+                        preConfirm: () => {
+                            const value1 = document.getElementById('swal-input1').value;
+                            const value2 = document.getElementById('swal-input2').value;
+                            const value3 = document.getElementById('swal-input3').value;
+                            const value4 = document.getElementById('swal-input4').value;
+                            const value5 = document.getElementById('swal-input5').value;
+                            return [value1, value2, value3, value4, value5];
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const [value1, value2, value3, value4, value5] = result.value;
+                            $.ajax({
+                                url: 'fetch_data.php',
+                                type: 'POST',
+                                data: {
+                                    updatestudent: true,
+                                    student_id: student_id,
+                                    student_firstname: value1,
+                                    student_middlename: value2,
+                                    student_lastname: value3,
+                                    student_address: value4,
+                                    student_status: value5,
+                                },
+                                success: function(response) {
+                                    if (response.trim() === "Updated Successfully") {
+                                        Swal.fire(
+                                            'Updated!',
+                                            'File has been updated successfully.',
+                                            'success'
+                                        );
+                                        $('#student').DataTable().ajax.reload(null, false);
+                                    } else {
+                                        Swal.fire(
+                                            'Failed!',
+                                            'Failed to update file.',
+                                            'error'
+                                        );
+                                    }
+                                },
+                            });
+                        }
+                    });
+                }
+            },
+        });
+    });
+    };
+
 
 
 
@@ -797,14 +920,417 @@ $(document).ready(function(){
             },
             {"data": null,
                 "render": function(data, type, row){
-                    return "<button class='btn btn-info'>Edit</button>";
+                    return "<button class='btn btn-info edit' data-teacher='"+row.teacher_id+"'>Edit</button>";
                 }
             },
             {"data": null,
                 "render": function(data, type, row){
-                    return "<button class='btn btn-danger'>Delete</button>";
+                    return "<button class='btn btn-danger delete' data-teacher='"+row.teacher_id+"'>Delete</button>";
                 }
             }
-        ]
+        ],
+        drawCallback: function(){
+            deletedteacher();
+            editteacher();
+        }
     });
 })
+
+
+function deletedteacher(){
+    $('#teacher').on('click', 'button.delete', function(){
+        let teacher_id = $(this).data('teacher');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want to delete it?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'fetch_data.php',
+                            type: 'POST',
+                            data: {
+                                deleteteacher: true,
+                                teacher_id: teacher_id
+                            },
+                            success: function(response) {
+                                if (response.trim() === "Your data has been deleted.") {
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'File has been deleted successfully.',
+                                        'success'
+                                    );
+                                    $('#teacher').DataTable().ajax.reload(null, false);
+                                } else {
+                                    Swal.fire(
+                                        'Failed!',
+                                        'Failed to delete file.',
+                                        'error'
+                                    );
+                                }
+                            },
+                        });
+                    }
+                });
+            });
+    }
+ 
+
+   function editteacher() {
+    $('#teacher').on('click', 'button.edit', function() {
+        let teacher_id = $(this).data('teacher');
+        $.ajax({
+            url: 'fetch_data.php',
+            type: 'POST',
+            data: {
+                getdatateacher: true,
+                teacher_id: teacher_id
+            },
+            success: function(response) {
+                if (response.trim() !== "") {
+                    var data = JSON.parse(response);
+                    Swal.fire({
+                        title: 'Student Details ',
+                        html: '<label>Firstname:</label>' +
+                              '<input id="swal-input1" class="form-control mb-2" value="' + data[0].teacher_name + '">' +
+                              '<label>Middlename:</label>' +
+                              '<input id="swal-input2" class="form-control mb-2" value="' + data[0].teacher_address + '">' +
+                              '<label>Lastname:</label>' +
+                              '<input id="swal-input3" class="form-control mb-2" value="' + data[0].teacher_mobile + '">' +
+                              '<label>Address:</label>' +
+                              '<input id="swal-input4" class="form-control mb-2" value="' + data[0].teacher_status + '">',
+                        focusConfirm: false,
+                        confirmButtonText: 'Update',
+                        preConfirm: () => {
+                            const value1 = document.getElementById('swal-input1').value;
+                            const value2 = document.getElementById('swal-input2').value;
+                            const value3 = document.getElementById('swal-input3').value;
+                            const value4 = document.getElementById('swal-input4').value;
+                            return [value1, value2, value3, value4];
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const [value1, value2, value3, value4, value5] = result.value;
+                            $.ajax({
+                                url: 'fetch_data.php',
+                                type: 'POST',
+                                data: {
+                                    updateteacher: true,
+                                    teacher_id: teacher_id,
+                                    teacher_name: value1,
+                                    teacher_address: value2,
+                                    teacher_mobile: value3,
+                                    teacher_status: value4,
+                                },
+                                success: function(response) {
+                                    if (response.trim() === "Updated Successfully") {
+                                        Swal.fire(
+                                            'Updated!',
+                                            'File has been updated successfully.',
+                                            'success'
+                                        );
+                                        $('#teacher').DataTable().ajax.reload(null, false);
+                                    } else {
+                                        Swal.fire(
+                                            'Failed!',
+                                            'Failed to update file.',
+                                            'error'
+                                        );
+                                    }
+                                },
+                            });
+                        }
+                    });
+                }
+            },
+        });
+    });
+    };
+
+
+
+
+$(document).ready(function(){
+    $('#classSched').DataTable({
+           serverSide: true,
+           lengthChange: true,
+           responsive: true,
+           autoWidth: false,
+           ajax: {
+               url: "fetch_data.php",
+               type: "POST",
+               data: {fetch_classSched: true},
+               error: function(xhr, error, thrown) {
+                   console.log("Ajax Failed: " + thrown);
+               }
+           },
+           columns: [
+               { "data": "subject_name" },
+               { "data": "teacher_name" },
+               { "data": "section_name" },
+               { 
+                  "data": "school_year_name"
+               },
+               {"data": null,
+                   "render": function(data, type, row){
+                       return "<button class='btn btn-info edit' data-classched='"+row.class_schedule_id+"'>Edit</button>";
+                   }
+               },
+               {"data": null,
+                   "render": function(data, type, row){
+                       return "<button class='btn btn-danger delete' data-classched='"+row.class_schedule_id+"'>Delete</button>";
+                   }
+               }
+           ],
+           drawCallback: function(){
+            edit();
+            deleted();
+           }
+       });
+   })
+
+   function deleted(){
+    $('#classSched').on('click', 'button.delete', function(){
+        let class_schedule_id = $(this).data('classched');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want to delete it?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'fetch_data.php',
+                            type: 'POST',
+                            data: {
+                                delete: true,
+                                class_schedule_id: class_schedule_id
+                            },
+                            success: function(response) {
+                                if (response.trim() === "Your data has been deleted.") {
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'File has been deleted successfully.',
+                                        'success'
+                                    );
+                                    $('#classSched').DataTable().ajax.reload(null, false);
+                                } else {
+                                    Swal.fire(
+                                        'Failed!',
+                                        'Failed to delete file.',
+                                        'error'
+                                    );
+                                }
+                            },
+                        });
+                    }
+                });
+            });
+    }
+ 
+
+   function edit() {
+    $('#classSched').on('click', 'button.edit', function() {
+        let class_schedule_id = $(this).data('classched');
+        $.ajax({
+            url: 'fetch_data.php',
+            type: 'POST',
+            data: {
+                getdata: true,
+                class_schedule_id: class_schedule_id
+            },
+            success: function(response) {
+                if (response.trim() !== "") {
+                    var data = JSON.parse(response);
+
+                    Swal.fire({
+                        title: 'EDIT DETAILS',
+                        html: '<label>Subject:</label>' +
+                              '<select id="swal-select1" class="form-control mb-2 select2"></select>' +
+                              '<label>Teacher:</label>' +
+                              '<select id="swal-select2" class="form-control mb-2 select2"></select>' +
+                              '<label>Section:</label>' +
+                              '<select id="swal-select3" class="form-control mb-2 select2"></select>' +
+                              '<label>School Year:</label>' +
+                              '<select id="swal-select4" class="form-control mb-2 select2 school_year"></select>',
+                        focusConfirm: false,
+                        confirmButtonText: 'Update',
+                        preConfirm: () => {
+                            const subject_id = $('#swal-select1').val();
+                            const teacher_id = $('#swal-select2').val();
+                            const section_id = $('#swal-select3').val();
+                            const school_year_id = $('#swal-select4').val();
+                            return [subject_id, teacher_id, section_id, school_year_id];
+                        },
+                        didOpen: () => {
+                            $('.select2').select2();
+
+                            $('#swal-select1').select2({
+                                theme: "bootstrap4",
+                                placeholder: 'Select Subject',
+                                ajax: {
+                                    url: 'select_fetch.php',
+                                    type: 'post',
+                                    dataType: "json",
+                                    delay: 250,
+                                    data: function(params) {
+                                        return {
+                                            subject: true,
+                                            term: params.term
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: $.map(data.results, function(subject) {
+                                                return {
+                                                    id: subject.subject_id,
+                                                    text: subject.subject_name
+                                                };
+                                            })
+                                        };
+                                    },
+                                    cache: true
+                                },
+                                minimumInputLength: 0,
+                                allowClear: true
+                            });
+                            $('#swal-select1').append(new Option(data.subject_name, data.subject_id, true, true));
+
+                            $('#swal-select2').select2({
+                                theme: "bootstrap4",
+                                placeholder: 'Select Teacher',
+                                ajax: {
+                                    url: 'select_fetch.php',
+                                    type: 'post',
+                                    dataType: "json",
+                                    delay: 250,
+                                    data: function(params) {
+                                        return {
+                                            teacher: true,
+                                            term: params.term
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: $.map(data.results, function(teacher) {
+                                                return {
+                                                    id: teacher.teacher_id,
+                                                    text: teacher.teacher_name
+                                                };
+                                            })
+                                        };
+                                    },
+                                    cache: true
+                                },
+                                minimumInputLength: 0,
+                                allowClear: true
+                            });
+                            $('#swal-select2').append(new Option(data.teacher_name, data.teacher_id, true, true));
+
+                            $('#swal-select3').select2({
+                                theme: "bootstrap4",
+                                placeholder: 'Select Section',
+                                ajax: {
+                                    url: 'select_fetch.php',
+                                    type: 'post',
+                                    dataType: "json",
+                                    delay: 250,
+                                    data: function(params) {
+                                        return {
+                                            section: true,
+                                            term: params.term
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: $.map(data.results, function(section) {
+                                                return {
+                                                    id: section.section_id,
+                                                    text: section.section_name
+                                                };
+                                            })
+                                        };
+                                    },
+                                    cache: true
+                                },
+                                minimumInputLength: 0,
+                                allowClear: true
+                            });
+                            $('#swal-select3').append(new Option(data.section_name, data.section_id, true, true));
+
+                            $('#swal-select4').select2({
+                                theme: "bootstrap4",
+                                placeholder: 'Select School Year',
+                                ajax: {
+                                    url: 'select_fetch.php',
+                                    type: 'post',
+                                    dataType: "json",
+                                    delay: 250,
+                                    data: function(params) {
+                                        return {
+                                            school_year: true,
+                                            term: params.term
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: $.map(data.results, function(school_year) {
+                                                return {
+                                                    id: school_year.school_year_id,
+                                                    text: school_year.school_year_name
+                                                };
+                                            })
+                                        };
+                                    },
+                                    cache: true
+                                },
+                                minimumInputLength: 0,
+                                allowClear: true
+                            });
+                            $('#swal-select4').append(new Option(data.school_year_name, data.school_year_id, true, true));
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const [subject_id, teacher_id, section_id, school_year_id] = result.value;
+                            $.ajax({
+                                url: 'fetch_data.php',
+                                type: 'POST',
+                                data: {
+                                    update: true,
+                                    class_schedule_id: class_schedule_id,
+                                    subject_id: subject_id,
+                                    teacher_id: teacher_id,
+                                    section_id: section_id,
+                                    school_year_id: school_year_id
+                                },
+                                success: function(response) {
+                                    if (response.trim() === "Updated Successfully") {
+                                        Swal.fire(
+                                            'Updated!',
+                                            'File has been updated successfully.',
+                                            'success'
+                                        );
+                                        $('#classSched').DataTable().ajax.reload(null, false);
+                                    } else {
+                                        Swal.fire(
+                                            'Failed!',
+                                            'Failed to update file.',
+                                            'error'
+                                        );
+                                    }
+                                },
+                            });
+                        }
+                    });
+                }
+            },
+        });
+    });
+}

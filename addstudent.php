@@ -63,8 +63,8 @@ include ('header.php');
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="studentmobile">Student Mobile</label>
-            <input type="text" class="form-control" id="studentmobile" name="studentmobile" placeholder="Mobile Number" required>
+            <label for="studentmobile">Student Mobile (Optional)</label>
+            <input type="text" class="form-control" id="studentmobile" name="studentmobile" placeholder="Mobile Number">
           </div>
           <div class="form-group col-md-6">
             <label for="studentaddress">Student Address</label>

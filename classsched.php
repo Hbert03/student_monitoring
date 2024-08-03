@@ -27,13 +27,13 @@ include ('header.php');
   <div class="card">
     <div class="card-body">
     <div class="table-responsive">
-                  <table id="teacher" class="table table-bordered table-striped">
+                  <table id="classSched" class="table table-bordered table-striped">
                     <thead>
                       <tr>
-                        <th>Name</th>
-                        <th>Address</th>
-                        <th>Mobile Number</th>
-                        <th>Status</th>
+                        <th>Subject</th>
+                        <th>Teacher</th>
+                        <th>Section</th>
+                        <th>School Year</th>
                         <th colspan="2">Action</th>
                       </tr>
                     </thead>
