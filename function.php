@@ -4,6 +4,7 @@ include ('database.php');
 if (isset($_POST['save'])) {
     $parentName = $_POST['parentname'];
     $mobileNumber = $_POST['mobilenumber'];
+    $email = $_POST['email'];
     $address = $_POST['address'];
     $firstName = $_POST['firstname'];
     $middleName = $_POST['middlename'];
@@ -28,12 +29,12 @@ if (isset($_POST['save'])) {
         echo json_encode(['success' => false, 'error' => "Student already exists"]);
     } else {
         // Insert parent details
-        $query = "INSERT INTO parent (parent_name, parent_mobile, parent_address) VALUES (?, ?, ?)";
+        $query = "INSERT INTO parent (parent_name, parent_mobile, email, parent_address) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
         if ($stmt === false) {
             die("Error preparing query for parent: " . $conn->error);
         }
-        $stmt->bind_param("sss", $parentName, $mobileNumber, $address);
+        $stmt->bind_param("ssss", $parentName, $mobileNumber, $email, $address);
 
         if ($stmt->execute()) {
             $parent_id = $stmt->insert_id;
@@ -171,5 +172,47 @@ if (isset($_POST['addsubject'])) {
         $stmt->close();
     }
  }
+
+ if (isset($_POST['addSection1'])) {
+    $section = $_POST['section'];
+    $school_year = $_POST['school_year'];
+    $students = isset($_POST['student']) ? $_POST['student'] : []; 
+
+ 
+    if (!empty($students)) {
+     
+        $conn->begin_transaction();
+
+        try {
+            $query = "INSERT INTO student_section (section_id, school_year_id, student_id) VALUES (?, ?, ?)";
+            $stmt = $conn->prepare($query);
+
+            if ($stmt) {
+                foreach ($students as $student) {
+                    $stmt->bind_param("sss", $section, $school_year, $student);
+
+                    if (!$stmt->execute()) {
+                        throw new Exception($stmt->error);
+                    }
+                }
+               
+                $conn->commit();
+                echo json_encode(["success" => true]);
+            } else {
+                throw new Exception("Failed to prepare the statement");
+            }
+        } catch (Exception $e) {
+           
+            $conn->rollback();
+            echo json_encode(["success" => false, "error" => $e->getMessage()]);
+        }
+
+        $stmt->close();
+    } else {
+        echo json_encode(["success" => false, "error" => "No students selected"]);
+    }
+
+    $conn->close();
+}
 
 ?>

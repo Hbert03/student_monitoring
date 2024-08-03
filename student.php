@@ -26,11 +26,21 @@ include ('header.php');
   <section class="content">
   <div class="card">
     <div class="card-body">
-     <table class="table">
-        <th>Name</th>
-        <th>Section</th>
-        <th>Grade Level</th>
-     </table>
+      <select id="sort_grade_level" class="form-control w-25 sort_grade_level"></select>
+    <div class="table-responsive">
+                  <table id="student" class="table table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Mobile Number</th>
+                        <th>Address</th>
+                        <th>QR CODE</th>
+                        <th colspan="2">Action</th>
+                      </tr>
+                    </thead>
+                <tbody></tbody>
+             </table>
+        </div>
   </div>
 </section>
 </div>

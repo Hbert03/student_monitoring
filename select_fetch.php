@@ -167,4 +167,30 @@ if (isset($_POST['school_year'])) {
 
     echo json_encode(['results' => $school]);
 }
+
+
+if(isset($_POST['addStudent1'])){
+    $empquery = "SELECT *, CONCAT(student_firstname, ' ', COALESCE(SUBSTRING(student_middlename, 1, 1), ''), '. ', student_lastname) AS fullname FROM student WHERE 1=1";
+
+    $terms = (isset($_POST['term']) && !empty($_POST['term'])) ? $_POST['term'] : null;
+
+    if($terms){
+        $empquery .= " AND (student_firstname LIKE '%" . $terms . "%'";
+        $empquery .= " OR student_middlename LIKE '%" . $terms . "%'";
+        $empquery .= " OR student_lastname LIKE '%" . $terms . "%')";
+    } else {
+        $empquery .= " LIMIT 10";
+    }
+
+    $query = $conn->query($empquery);
+    $school = array();
+
+    while ($row = $query->fetch_assoc()) {
+        $school[] = $row;
+    }
+
+    $conn->close();
+
+    echo json_encode(['results' => $school]);
+};
 ?>

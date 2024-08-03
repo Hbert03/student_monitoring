@@ -1,13 +1,14 @@
-<?php 
-include ('header.php');
-include ('class.php');
+<?php
+
+
+include('header.php');
+include('class.php');
 
 $elems = new Elementary();
 $totalElems = $elems->getValue("totalElems");
 
 $junior = new Junior_High();
 $totalJunior = $junior->getValue("totalJunior");
-
 
 $senior = new Senior_High();
 $totalSenior = $senior->getValue("totalSenior");
@@ -55,7 +56,7 @@ $totalSenior = $senior->getValue("totalSenior");
                 <p>ELEMENTARY</p>
               </div>
               <div class="icon">
-                <i class="ion ion-bag"></i>
+              <i class="nav-icon fas fa-user-graduate"></i>
               </div>
     
             </div>
@@ -70,7 +71,7 @@ $totalSenior = $senior->getValue("totalSenior");
                 <p>JUNIOR HIGH SCHOOL</p>
               </div>
               <div class="icon">
-                <i class="ion ion-stats-bars"></i>
+              <i class="nav-icon fas fa-user-graduate"></i>
               </div>
         
             </div>
@@ -85,7 +86,7 @@ $totalSenior = $senior->getValue("totalSenior");
                 <p>SENIOR HIGH SCHOOL</p>
               </div>
               <div class="icon">
-                <i class="ion ion-person-add"></i>
+              <i class="nav-icon fas fa-user-graduate"></i>
               </div>
          
             </div>

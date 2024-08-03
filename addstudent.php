@@ -28,13 +28,17 @@ include ('header.php');
     <div class="card-body">
       <form id="addStudentForm">
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
             <label for="parentname">Parent Name</label>
             <input type="text" class="form-control" id="parentname" name="parentname" placeholder="Fullname" required>
           </div>
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
             <label for="mobilenumber">Mobile Number</label>
             <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" placeholder="Mobile Number" required>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="mobilenumber">Email (Optional)</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email" >
           </div>
         </div>
         <div class="form-row">
@@ -89,6 +93,11 @@ include ('header.php');
           <button type="submit" class="btn1">Save</button>
         </div>
       </form>
+      <div id="qrCodeContainer" class="text-center mt-3"></div>
+      <div class="text-center mt-3">
+        <a id="downloadLink" href="#" download="qrcode.png" style="display:none;" class="btn btn-success">Download QR Code</a>
+      </div>
+    </div>
   </div>
 </section>
 </div>

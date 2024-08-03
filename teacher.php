@@ -26,22 +26,20 @@ include ('header.php');
   <section class="content">
   <div class="card">
     <div class="card-body">
-      <form id="addStudentForm">
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="fullname">Section Name</label>
-            <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Section Name" required>
-          </div>
-          <div class="form-group col-md-6">
-            <label for="address">Grade Level</label>
-            <select class="form-control"></select>
-          </div>
+    <div class="table-responsive">
+                  <table id="teacher" class="table table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Mobile Number</th>
+                        <th>Status</th>
+                        <th colspan="2">Action</th>
+                      </tr>
+                    </thead>
+                <tbody></tbody>
+             </table>
         </div>
-        <div class="text-center">
-          <button type="submit" class="btn btn-primary btn2">Save</button>
-        </div>
-      </form>
-
   </div>
 </section>
 </div>

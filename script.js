@@ -1,3 +1,22 @@
+
+
+function confirmLogout() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'You will be logged out!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById("logoutForm").submit();
+        }
+    });
+}
+
+
 $(document).ready(function() {
   $("button.btn1").on("click", function(event) {
       event.preventDefault();
@@ -484,6 +503,10 @@ $(document).ready(function() {
                     })
 
 
+                   
+    
+
+
 //add section
     $(document).ready(function() {
         $("button.btn3").on("click", function(event) {
@@ -584,3 +607,204 @@ $(document).ready(function() {
             }
         });
     });
+
+
+
+// student
+$(document).ready(function() {
+    $('select.student').select2({
+        theme: "bootstrap4",
+        placeholder: 'Select Students',
+        ajax: {
+            url: 'select_fetch.php',
+            type: 'post',
+            dataType: "json",
+            delay: 250,
+            data: function(params) {
+                return {
+                    addStudent1: true,
+                    term: params.term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: $.map(data.results, function(student) {
+                        return {
+                            id: student.student_id,
+                            text: student.fullname
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0,
+        allowClear: true,
+        multiple: true // Enable multiple selection
+    });
+
+    $("button.btn5").on("click", function(event) {
+        event.preventDefault();
+
+        var requiredFilled = true;
+        $("#addstudentSectionForm select").each(function() {
+            if ($(this).prop("required") && $(this).val() === "") {
+                requiredFilled = false;
+                $(this).addClass("is-invalid");
+            } else {
+                $(this).removeClass("is-invalid");
+            }
+        });
+
+        if (requiredFilled) {
+            $.ajax({
+                url: "function.php",
+                type: "POST",
+                data: $("#addstudentSectionForm").serialize() + "&addSection1=true",
+                success: function(response) {
+                    try {
+                        response = JSON.parse(response);
+                    } catch (e) {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Failed",
+                            icon: "error"
+                        });
+                        return;
+                    }
+
+                    if (response.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Section Save!",
+                            showConfirmButton: true
+                        });
+                    } else {
+                        toastr.error("Verify your Entry: " + response.error);
+                    }
+                }
+            });
+        } else {
+            toastr.error("Please fill out all required fields.");
+        }
+    });
+});
+
+
+
+
+$(document).ready(function() {
+    $('select.sort_grade_level').select2({
+        theme: "bootstrap4",
+        placeholder: 'Sort By Grade Level',
+        ajax: {
+            url: 'select_fetch.php',
+            type: 'POST',
+            dataType: "json",
+            delay: 250,
+            data: function(params) {
+                return {
+                    gradelevel: true,
+                    term: params.term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: $.map(data.results, function(grade) {
+                        return {
+                            id: grade.grade_level,
+                            text: grade.grade_level_name
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0,
+        allowClear: true
+    });
+    $(".select2-container").css("margin-bottom", "1em");
+    // Initialize DataTable
+    var table = $('#student').DataTable({
+        serverSide: true,
+        lengthChange: true,
+        responsive: true,
+        autoWidth: false,
+        ajax: {
+            url: "fetch_data.php",
+            type: "POST",
+            data: function(d) {
+                d.fetch = true;
+                d.grade_level = $('#sort_grade_level').val();
+            },
+            error: function(xhr, error, thrown) {
+                console.log("Ajax Failed: " + thrown);
+            }
+        },
+        columns: [
+            { "data": "fullname" },
+            { "data": "student_mobile" },
+            { "data": "student_address" },
+            { 
+                "data": "qrcode",
+                "orderable": false,
+                "searchable": false,
+                "render": function(data, type, row) {
+                    return data;
+                }
+            },
+            {"data": null,
+                "render": function(data, type, row){
+                    return "<button class='btn btn-info'>Edit</button>";
+                }
+            },
+            {"data": null,
+                "render": function(data, type, row){
+                    return "<button class='btn btn-danger'>Delete</button>";
+                }
+            }
+        ]
+    });
+
+   
+    $('#sort_grade_level').on('change', function() {
+        table.draw();
+    });
+});
+
+
+
+$(document).ready(function(){
+ $('#teacher').DataTable({
+        serverSide: true,
+        lengthChange: true,
+        responsive: true,
+        autoWidth: false,
+        ajax: {
+            url: "fetch_data.php",
+            type: "POST",
+            data: {fetch_teacher: true},
+            error: function(xhr, error, thrown) {
+                console.log("Ajax Failed: " + thrown);
+            }
+        },
+        columns: [
+            { "data": "teacher_name" },
+            { "data": "teacher_address" },
+            { "data": "teacher_mobile" },
+            { 
+               "data": "teacher_status"
+            },
+            {"data": null,
+                "render": function(data, type, row){
+                    return "<button class='btn btn-info'>Edit</button>";
+                }
+            },
+            {"data": null,
+                "render": function(data, type, row){
+                    return "<button class='btn btn-danger'>Delete</button>";
+                }
+            }
+        ]
+    });
+})
