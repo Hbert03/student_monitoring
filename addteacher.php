@@ -29,8 +29,18 @@ include ('header.php');
       <form id="addteacherForm">
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="fullname">Fullname</label>
-            <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Name" required>
+            <label for="firstname">Firstname</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname" required>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="middlename">Middlename</label>
+            <input type="text" class="form-control" id="middlename" name="middlename" placeholder="Middlename" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="lastname">Lastname</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Lastname" required>
           </div>
           <div class="form-group col-md-6">
             <label for="address">Address</label>

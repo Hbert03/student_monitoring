@@ -323,7 +323,7 @@ $("button.add_subject").on("click", function() {
                         });
                     }
                     else {
-                        toastr.error("Verify your Entry: ");
+                        toastr.error("Already Exist");
                     }
                 }
             });
@@ -755,12 +755,12 @@ $(document).ready(function() {
             },
             {"data": null,
                 "render": function(data, type, row){
-                    return "<button class='btn btn-info edit' data-student='"+row.student_id+"'>Edit</button>";
+                    return "<button class='btn btn-info btn-sm edit' data-student='"+row.student_id+"'>Edit</button>";
                 }
             },
             {"data": null,
                 "render": function(data, type, row){
-                    return "<button class='btn btn-danger delete' data-student='"+ row.student_id+"'>Delete</button>";
+                    return "<button class='btn btn-danger btn-sm delete' data-student='"+ row.student_id+"'>Delete</button>";
                 }
             }
         ],
@@ -912,7 +912,7 @@ $(document).ready(function(){
             }
         },
         columns: [
-            { "data": "teacher_name" },
+            { "data": "fullname" },
             { "data": "teacher_address" },
             { "data": "teacher_mobile" },
             { 
@@ -920,12 +920,12 @@ $(document).ready(function(){
             },
             {"data": null,
                 "render": function(data, type, row){
-                    return "<button class='btn btn-info edit' data-teacher='"+row.teacher_id+"'>Edit</button>";
+                    return "<button class='btn btn-info btn-sm edit' data-teacher='"+row.teacher_id+"'>Edit</button>";
                 }
             },
             {"data": null,
                 "render": function(data, type, row){
-                    return "<button class='btn btn-danger delete' data-teacher='"+row.teacher_id+"'>Delete</button>";
+                    return "<button class='btn btn-danger btn-sm delete' data-teacher='"+row.teacher_id+"'>Delete</button>";
                 }
             }
         ],
@@ -996,13 +996,17 @@ function deletedteacher(){
                     Swal.fire({
                         title: 'Student Details ',
                         html: '<label>Firstname:</label>' +
-                              '<input id="swal-input1" class="form-control mb-2" value="' + data[0].teacher_name + '">' +
+                              '<input id="swal-input1" class="form-control mb-2" value="' + data[0].teacher_firstname + '">' +
                               '<label>Middlename:</label>' +
-                              '<input id="swal-input2" class="form-control mb-2" value="' + data[0].teacher_address + '">' +
+                              '<input id="swal-input2" class="form-control mb-2" value="' + data[0].teacher_middlename + '">' +
                               '<label>Lastname:</label>' +
-                              '<input id="swal-input3" class="form-control mb-2" value="' + data[0].teacher_mobile + '">' +
+                              '<input id="swal-input3" class="form-control mb-2" value="' + data[0].teacher_lastname + '">' +
                               '<label>Address:</label>' +
-                              '<input id="swal-input4" class="form-control mb-2" value="' + data[0].teacher_status + '">',
+                              '<input id="swal-input4" class="form-control mb-2" value="' + data[0].teacher_address + '">' +
+                              '<label>Mobile Number:</label>' +
+                              '<input id="swal-input5" class="form-control mb-2" value="' + data[0].teacher_mobile + '">' +
+                              '<label>Status:</label>' +
+                              '<input id="swal-input6" class="form-control mb-2" value="' + data[0].teacher_status + '">',
                         focusConfirm: false,
                         confirmButtonText: 'Update',
                         preConfirm: () => {
@@ -1010,21 +1014,25 @@ function deletedteacher(){
                             const value2 = document.getElementById('swal-input2').value;
                             const value3 = document.getElementById('swal-input3').value;
                             const value4 = document.getElementById('swal-input4').value;
-                            return [value1, value2, value3, value4];
+                            const value5 = document.getElementById('swal-input5').value;
+                            const value6 = document.getElementById('swal-input6').value;
+                            return [value1, value2, value3, value4, value5, value6];
                         },
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const [value1, value2, value3, value4, value5] = result.value;
+                            const [value1, value2, value3, value4, value5, value6]= result.value;
                             $.ajax({
                                 url: 'fetch_data.php',
                                 type: 'POST',
                                 data: {
                                     updateteacher: true,
                                     teacher_id: teacher_id,
-                                    teacher_name: value1,
-                                    teacher_address: value2,
-                                    teacher_mobile: value3,
-                                    teacher_status: value4,
+                                    teacher_firstname: value1,
+                                    teacher_middlename: value2,
+                                    teacher_lastname: value3,
+                                    teacher_address: value4,
+                                    teacher_mobile: value5,
+                                    teacher_status: value6,
                                 },
                                 success: function(response) {
                                     if (response.trim() === "Updated Successfully") {
@@ -1077,12 +1085,12 @@ $(document).ready(function(){
                },
                {"data": null,
                    "render": function(data, type, row){
-                       return "<button class='btn btn-info edit' data-classched='"+row.class_schedule_id+"'>Edit</button>";
+                       return "<button class='btn btn-info btn-sm edit' data-classched='"+row.class_schedule_id+"'>Edit</button>";
                    }
                },
                {"data": null,
                    "render": function(data, type, row){
-                       return "<button class='btn btn-danger delete' data-classched='"+row.class_schedule_id+"'>Delete</button>";
+                       return "<button class='btn btn-danger btn-sm delete' data-classched='"+row.class_schedule_id+"'>Delete</button>";
                    }
                }
            ],

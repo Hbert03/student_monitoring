@@ -66,7 +66,7 @@ if (isset($_POST['fetch'])) {
 
             $row['qrcode'] = '<div style="text-align: center;">
                                 <img src="' . $qrFileName . '" style="max-width: 100px; display: block; margin: 0 auto;" alt="QR Code">
-                                <a href="' . $qrFileName . '" download class="btn btn-primary mt-2">Download QR</a>
+                                <a href="' . $qrFileName . '" download class="btn btn-primary btn-sm mt-1">Download QR</a>
                               </div>';
 
             $data[] = $row;
@@ -92,13 +92,12 @@ if (isset($_POST['fetch'])) {
     exit();
 }
 
-
 if (isset($_POST['fetch_teacher'])) {
 
     function getDataTable($draw, $start, $length, $search) {
         global $conn;
 
-        $sortableColumns = array('teacher_name');
+        $sortableColumns = array('teacher_firstname', 'teacher_lastname'); 
         
         $orderBy = $sortableColumns[0];
         $orderDir = 'ASC';
@@ -112,30 +111,33 @@ if (isset($_POST['fetch_teacher'])) {
             }
         }
 
-        $query1 = "SELECT * FROM teacher WHERE 1=1";
+        $query1 = "SELECT *, CONCAT(teacher_firstname, ' ', COALESCE(SUBSTRING(teacher_middlename, 1, 1), ''), '. ', teacher_lastname) AS fullname FROM teacher WHERE 1=1";
 
         if (!empty($search)) {
             $escapedSearch = $conn->real_escape_string($search);
-            $query1 .= " AND (teacher_name LIKE '%$escapedSearch%' OR teacher_address LIKE '%$escapedSearch%')";
+            $query1 .= " AND (teacher_firstname LIKE '%$escapedSearch%' OR teacher_lastname LIKE '%$escapedSearch%' OR teacher_address LIKE '%$escapedSearch%')";
         }
-        
 
-    
         $query1 .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
 
         $result1 = $conn->query($query1);
 
-        $totalQuery1 = "SELECT COUNT(*) AS total_count 
-                        FROM teacher 
-                        WHERE 1=1";
-
-        if (!empty($search)) {
-         $escapedSearch = $conn->real_escape_string($search);
-        $totalQuery1 .= " AND (teacher_name LIKE '%$escapedSearch%' OR teacher_address LIKE '%$escapedSearch%')";
+        if (!$result1) {
+            die("Query failed: " . $conn->error); 
         }
 
+        $totalQuery1 = "SELECT COUNT(*) AS total_count FROM teacher WHERE 1=1";
+
+        if (!empty($search)) {
+            $escapedSearch = $conn->real_escape_string($search);
+            $totalQuery1 .= " AND (teacher_firstname LIKE '%$escapedSearch%' OR teacher_lastname LIKE '%$escapedSearch%' OR teacher_address LIKE '%$escapedSearch%')";
+        }
 
         $totalResult1 = $conn->query($totalQuery1);
+        if (!$totalResult1) {
+            die("Total count query failed: " . $conn->error);
+        }
+
         $totalRow1 = $totalResult1->fetch_assoc();
         $totalRecords1 = $totalRow1['total_count'];
 
@@ -144,11 +146,10 @@ if (isset($_POST['fetch_teacher'])) {
             $data[] = $row;
         }
 
-       
         $output = array(
             "draw" => intval($draw),
             "recordsTotal" => intval($totalRecords1),
-            "recordsFiltered" => intval($totalRecords1),
+            "recordsFiltered" => intval($totalRecords1), 
             "data" => $data
         );
 
@@ -160,9 +161,10 @@ if (isset($_POST['fetch_teacher'])) {
     $length = $_POST["length"];
     $search = $_POST["search"]["value"];
 
-    echo getDataTable($draw, $start, $length, $search);    
+    echo getDataTable($draw, $start, $length, $search);
     exit();
 }
+
 
 
 
@@ -412,30 +414,75 @@ if (isset($_POST['getdatateacher'])) {
     }
     exit();
 }
-
-
 if (isset($_POST['deleteteacher'])) { 
     $teacher_id = $_POST['teacher_id'];
-    $query = "DELETE FROM teacher WHERE teacher_id = '$teacher_id'";
-    if (mysqli_query($conn, $query)) {
-        echo "Your data has been deleted."; 
-    } else {
-        echo "Failed to delete data."; 
+
+ 
+    if (empty($teacher_id) || !is_numeric($teacher_id)) {
+        echo "Invalid teacher ID.";
+        exit();
     }
-    exit();
+
+    $teacher_id = intval($teacher_id); 
+
+
+    $conn->begin_transaction();
+
+    try {
+     
+        $query1 = "SELECT * FROM teacher WHERE teacher_id = ?";
+        $stmt1 = $conn->prepare($query1);
+        $stmt1->bind_param("i", $teacher_id);
+        $stmt1->execute();
+        $result1 = $stmt1->get_result();
+        
+        if ($result1->num_rows > 0) {
+            $email = $result1->fetch_assoc()['teacher_id'];
+
+            $query2 = "DELETE FROM users WHERE teacher_id = ?";
+            $stmt2 = $conn->prepare($query2);
+            $stmt2->bind_param("s", $email);
+            $stmt2->execute();
+            $stmt2->close();
+
+ 
+            $query3 = "DELETE FROM teacher WHERE teacher_id = ?";
+            $stmt3 = $conn->prepare($query3);
+            $stmt3->bind_param("i", $teacher_id);
+            $stmt3->execute();
+            $stmt3->close();
+
+        
+            $conn->commit();
+
+            echo "Your data has been deleted.";
+        } else {
+            echo "Teacher not found.";
+        }
+
+    } catch (Exception $e) {
+        // Rollback transaction on error
+        $conn->rollback();
+        echo "Failed to delete data: " . $e->getMessage();
+    }
 }
+
+
 
 
 if (isset($_POST['updateteacher'])) {
     $teacher_id = $_POST['teacher_id'];
-    $value1 = $_POST['teacher_name'];
-    $value2 = $_POST['teacher_address'];
-    $value3 = $_POST['teacher_mobile'];
-    $value4 = $_POST['teacher_status'];
+    $value1 = $_POST['teacher_firstname'];
+    $value2 = $_POST['teacher_middlename'];
+    $value3 = $_POST['teacher_lastname'];
+    $value4 = $_POST['teacher_address'];
+    $value5 = $_POST['teacher_mobile'];
+    $value6 = $_POST['teacher_status'];
    
 
     $query = "UPDATE teacher
-              SET teacher_name = '$value1', teacher_address = '$value2', teacher_mobile = '$value3', teacher_status = '$value4'
+              SET teacher_firstname = '$value1', teacher_middlename = '$value2', teacher_lastname = '$value3', teacher_address = '$value4',
+               teacher_mobile = '$value5',  teacher_status = '$value6'
               WHERE teacher_id = '$teacher_id'";
     if (mysqli_query($conn, $query)) {
         echo "Updated Successfully";

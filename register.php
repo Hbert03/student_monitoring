@@ -40,11 +40,7 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <select class="form-control" name="role" required>
-            <option value="">Select Role</option>
-            <option value="Admin">Admin</option>
-            <option value="Teacher">Teacher</option>
-          </select>
+         <input type="text" class="form-control" name="role" value="Admin" readonly>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-user"></span>

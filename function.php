@@ -64,28 +64,70 @@ if (isset($_POST['save'])) {
     $conn->close();
 }
 
-if(isset($_POST['save_teacher'])) {
-    $fullname = $_POST['fullname'];
+
+
+if (isset($_POST['save_teacher'])) {
+
+    $firstname = $_POST['firstname'];
+    $middlename = $_POST['middlename'];
+    $lastname = $_POST['lastname'];
     $address = $_POST['address'];
     $mobile = $_POST['mobile_num'];
     $status = $_POST['status'];
 
-    $query = "INSERT INTO teacher(teacher_name, teacher_address, teacher_mobile, teacher_status) 
-              VALUES (?, ?, ?, ?)";
-    $stmt = $conn->prepare($query);
+    $checkQuery = "SELECT * FROM teacher WHERE teacher_firstname = ? AND teacher_lastname = ? AND teacher_mobile = ?";
+    $checkStmt = $conn->prepare($checkQuery);
 
-    if($stmt) {
-        $stmt->bind_param("ssss", $fullname, $address, $mobile, $status);
-        if($stmt->execute()) {
-            echo json_encode(["success" => true]);
+    if ($checkStmt) {
+        $checkStmt->bind_param("sss", $firstname, $lastname, $mobile);
+        $checkStmt->execute();
+        $result = $checkStmt->get_result();
+
+        if ($result->num_rows > 0) {
+           
+            echo json_encode(["success" => false, "message" => "Teacher already exists."]);
         } else {
-            echo json_encode(["success" => false, "error" => $stmt->error]);
+           
+            $query = "INSERT INTO teacher (teacher_firstname, teacher_middlename, teacher_lastname, teacher_address, teacher_mobile, teacher_status) VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($query);
+
+            if ($stmt) {
+                $stmt->bind_param("ssssss", $firstname, $middlename, $lastname, $address, $mobile, $status);
+                if ($stmt->execute()) {
+                    $teacher_id = $stmt->insert_id;
+                    $email = strtolower($firstname . '.' . $lastname) . '@bnhs.gov.ph';
+                    $password = 'password';
+                    
+                    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+                    $role = 1; 
+                    
+                 
+                    $query = "INSERT INTO users (email, password, role, teacher_id) VALUES (?, ?, ?, ?)";
+                    $stmt = $conn->prepare($query);
+
+                    if ($stmt) {
+                        $stmt->bind_param("sssi", $email, $hashed_password, $role, $teacher_id);
+                        if ($stmt->execute()) {
+                            echo json_encode(["success" => true, "message" => "Teacher and user account created successfully."]);
+                        } else {
+                            echo json_encode(["success" => false, "error" => $stmt->error]);
+                        }
+                        $stmt->close();
+                    } else {
+                        echo json_encode(["success" => false, "error" => $conn->error]);
+                    }
+                } else {
+                    echo json_encode(["success" => false, "error" => $stmt->error]);
+                }
+            }
         }
-        $stmt->close();
-    } else {
-        echo json_encode(["success" => false, "error" => $conn->error]);
     }
 }
+
+
+
+
+
 
 
 if (isset($_POST['addschoolyear'])) {
