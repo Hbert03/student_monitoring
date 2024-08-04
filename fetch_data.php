@@ -167,13 +167,12 @@ if (isset($_POST['fetch_teacher'])) {
 
 
 
-
 if (isset($_POST['fetch_classSched'])) {
 
     function getDataTable($draw, $start, $length, $search) {
         global $conn;
 
-        $sortableColumns = array('subject_name, teacher_name, section_name, school_year_name');
+        $sortableColumns = array('subject_name', 'fullname', 'section_name', 'school_year_name');
         
         $orderBy = $sortableColumns[0];
         $orderDir = 'ASC';
@@ -187,42 +186,43 @@ if (isset($_POST['fetch_classSched'])) {
             }
         }
 
-        $query1 = "SELECT cs.class_schedule_id, su.subject_name, te.teacher_name, se.section_name, sc.school_year_name 
-        FROM class_schedule cs 
-        INNER JOIN subject su ON cs.subject_id = su.subject_id 
-        INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
-        INNER JOIN section se ON cs.section_id = se.section_id 
-        INNER JOIN school_year sc ON cs.school_year_id = sc.school_year_id 
-        WHERE 1=1";
-
+        $query1 = "SELECT cs.class_schedule_id, cs.teacher_id, su.subject_name, te.teacher_firstname, te.teacher_middlename, te.teacher_lastname, 
+                          CONCAT(te.teacher_firstname, ' ', COALESCE(SUBSTRING(te.teacher_middlename, 1, 1), ''), '. ', te.teacher_lastname) AS fullname, 
+                          se.section_name, sc.school_year_name 
+                   FROM class_schedule cs 
+                   INNER JOIN subject su ON cs.subject_id = su.subject_id 
+                   INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+                   INNER JOIN section se ON cs.section_id = se.section_id 
+                   INNER JOIN school_year sc ON cs.school_year_id = sc.school_year_id 
+                   WHERE 1=1";
 
         if (!empty($search)) {
             $escapedSearch = $conn->real_escape_string($search);
-            $query1 .= " AND (subject_name LIKE '%$escapedSearch%' OR teacher_name LIKE '%$escapedSearch%' OR section_name LIKE '%$escapedSearch%' OR school_year_name LIKE '%$escapedSearch%')";
+            $query1 .= " AND (su.subject_name LIKE '%$escapedSearch%' OR 
+                              CONCAT(te.teacher_firstname, ' ', COALESCE(SUBSTRING(te.teacher_middlename, 1, 1), ''), '. ', te.teacher_lastname) LIKE '%$escapedSearch%' OR 
+                              se.section_name LIKE '%$escapedSearch%' OR 
+                              sc.school_year_name LIKE '%$escapedSearch%')";
         }
-        
 
-    
         $query1 .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
 
         $result1 = $conn->query($query1);
 
         $totalQuery1 = "SELECT COUNT(*) AS total_count 
-        FROM class_schedule cs 
-        INNER JOIN subject su ON cs.subject_id = su.subject_id 
-        INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
-        INNER JOIN section se ON cs.section_id = se.section_id 
-        INNER JOIN school_year sc ON cs.school_year_id = sc.school_year_id 
-        WHERE 1=1";
-
+                        FROM class_schedule cs 
+                        INNER JOIN subject su ON cs.subject_id = su.subject_id 
+                        INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+                        INNER JOIN section se ON cs.section_id = se.section_id 
+                        INNER JOIN school_year sc ON cs.school_year_id = sc.school_year_id 
+                        WHERE 1=1";
 
         if (!empty($search)) {
-         $escapedSearch = $conn->real_escape_string($search);
-        $totalQuery1 .= " AND (subject_name LIKE '%$escapedSearch%' OR teacher_name LIKE '%$escapedSearch%' OR section_name LIKE '%$escapedSearch%' OR school_year_name LIKE '%$escapedSearch%')";
+            $escapedSearch = $conn->real_escape_string($search);
+            $totalQuery1 .= " AND (su.subject_name LIKE '%$escapedSearch%' OR 
+                                  CONCAT(te.teacher_firstname, ' ', COALESCE(SUBSTRING(te.teacher_middlename, 1, 1), ''), '. ', te.teacher_lastname) LIKE '%$escapedSearch%' OR 
+                                  se.section_name LIKE '%$escapedSearch%' OR 
+                                  sc.school_year_name LIKE '%$escapedSearch%')";
         }
-        
-       
-
 
         $totalResult1 = $conn->query($totalQuery1);
         $totalRow1 = $totalResult1->fetch_assoc();
@@ -233,7 +233,6 @@ if (isset($_POST['fetch_classSched'])) {
             $data[] = $row;
         }
 
-       
         $output = array(
             "draw" => intval($draw),
             "recordsTotal" => intval($totalRecords1),
@@ -247,7 +246,7 @@ if (isset($_POST['fetch_classSched'])) {
     $draw = $_POST["draw"];
     $start = $_POST["start"];
     $length = $_POST["length"];
-    $search = $_POST["search"]["value"];
+    $search = isset($_POST["search"]["value"]) ? $_POST["search"]["value"] : '';
 
     echo getDataTable($draw, $start, $length, $search);    
     exit();
@@ -257,7 +256,8 @@ if (isset($_POST['fetch_classSched'])) {
 
 if (isset($_POST['getdata'])) {
     $id = $_POST['class_schedule_id'];
-    $query = "SELECT cs.class_schedule_id, su.subject_name, te.teacher_name, se.section_name, sc.school_year_name 
+    $query = "SELECT cs.class_schedule_id, su.subject_name, te.teacher_firstname, te.teacher_middlename, te.teacher_lastname, 
+            CONCAT(te.teacher_firstname, ' ', COALESCE(SUBSTRING(te.teacher_middlename, 1, 1), ''), '. ', te.teacher_lastname) AS fullname, se.section_name, sc.school_year_name 
         FROM class_schedule cs 
         INNER JOIN subject su ON cs.subject_id = su.subject_id 
         INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
@@ -381,10 +381,12 @@ if (isset($_POST['updatestudent'])) {
     $value3 = $_POST['student_lastname'];
     $value4 = $_POST['student_address'];
     $value5 = $_POST['student_status'];
+    $grade_level_id = $_POST['grade_level_id'];
    
 
     $query = "UPDATE student
               SET student_firstname = '$value1', student_middlename = '$value2', student_lastname = '$value3', student_address = '$value4', student_status = '$value5'
+              , grade_level_id = '$grade_level_id'
               WHERE student_id = '$student_id'";
     if (mysqli_query($conn, $query)) {
         echo "Updated Successfully";
@@ -490,5 +492,90 @@ if (isset($_POST['updateteacher'])) {
         echo "Failed to update file in the database.";
     }
 }
+
+
+
+
+
+
+if (isset($_POST['viewstudent'])) {
+
+    function getDataTable($draw, $start, $length, $search, $teacher_id) {
+        global $conn;
+
+        $sortableColumns = array('student_firstname');
+        
+        $orderBy = $sortableColumns[0];
+        $orderDir = 'ASC';
+
+        if (isset($_POST['order'][0]['column']) && isset($_POST['order'][0]['dir'])) {
+            $columnIdx = intval($_POST['order'][0]['column']);
+            $orderDir = $_POST['order'][0]['dir'];
+
+            if (isset($sortableColumns[$columnIdx])) {
+                $orderBy = $sortableColumns[$columnIdx];
+            }
+        }
+
+        $query1 = "SELECT gr.grade_level_name, st.*, CONCAT(student_firstname, ' ', COALESCE(SUBSTRING(student_middlename, 1, 1), ''), '. ', student_lastname) AS fullname FROM student st INNER JOIN student_section sts ON st.student_id = sts.student_id
+         INNER JOIN section se ON sts.section_id = se.section_id INNER JOIN class_schedule cs ON se.section_id = cs.section_id INNER JOIN grade_level gr ON gr.grade_level = se.section_id INNER JOIN teacher te ON cs.teacher_id = te.teacher_id WHERE te.teacher_id = ?";
+
+        if (!empty($search)) {
+            $escapedSearch = $conn->real_escape_string($search);
+            $query1 .= " AND (st.student_firstname LIKE '%$escapedSearch%')";
+        }
+
+        $query1 .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
+
+        $stmt = $conn->prepare($query1);
+        $stmt->bind_param('i', $teacher_id);
+        $stmt->execute();
+        $result1 = $stmt->get_result();
+
+        $totalQuery1 = "SELECT COUNT(*) AS total_count 
+                        FROM student st 
+                        INNER JOIN student_section sts ON st.student_id = sts.student_id 
+                        INNER JOIN section se ON sts.section_id = se.section_id 
+                        INNER JOIN class_schedule cs ON se.section_id = cs.section_id 
+                        INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+                        WHERE te.teacher_id = ?";
+
+        if (!empty($search)) {
+            $escapedSearch = $conn->real_escape_string($search);
+            $totalQuery1 .= " AND (st.student_firstname LIKE '%$escapedSearch%')";
+        }
+
+        $stmtTotal = $conn->prepare($totalQuery1);
+        $stmtTotal->bind_param('i', $teacher_id);
+        $stmtTotal->execute();
+        $totalResult1 = $stmtTotal->get_result();
+        $totalRow1 = $totalResult1->fetch_assoc();
+        $totalRecords1 = $totalRow1['total_count'];
+
+        $data = array();
+        while ($row = $result1->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => intval($draw),
+            "recordsTotal" => intval($totalRecords1),
+            "recordsFiltered" => intval($totalRecords1),
+            "data" => $data
+        );
+
+        return json_encode($output);
+    }
+
+    $draw = $_POST["draw"];
+    $start = $_POST["start"];
+    $length = $_POST["length"];
+    $search = isset($_POST["search"]["value"]) ? $_POST["search"]["value"] : '';
+    $teacher_id = $_POST["teacher_id"];
+
+    echo getDataTable($draw, $start, $length, $search, $teacher_id);    
+    exit();
+}
+
 
 ?>

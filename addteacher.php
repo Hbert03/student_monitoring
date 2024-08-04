@@ -55,7 +55,7 @@ include ('header.php');
           <div class="form-group col-md-6">
           <label for="status">Status</label>
              <select class="form-control" id="status" name="status" required>
-                  <option value="" disabled selected>Select your status</option>
+                  <option value="" disabled selected>Select status</option>
                   <option value="single">Single</option>
                   <option value="married">Married</option>
                   <option value="divorced">Divorced</option>

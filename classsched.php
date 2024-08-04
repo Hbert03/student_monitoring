@@ -2,7 +2,31 @@
 include ('header.php');
 ?>
 
-
+<!-- Modal -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewModalLabel">Class Schedule Details</h5>
+      </div>
+      <div class="card">
+    <div class="card-body">
+    <div class="table-responsive">
+                  <table id="viewstudent" class="table table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Grade level</th>
+                      </tr>
+                    </thead>
+                <tbody></tbody>
+             </table>
+        </div>
+  </div>
+  </div>
+    </div>
+  </div>
+</div>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -34,15 +58,20 @@ include ('header.php');
                         <th>Teacher</th>
                         <th>Section</th>
                         <th>School Year</th>
-                        <th colspan="2">Action</th>
+                        <th colspan="3" class="text-center">Action</th>
                       </tr>
                     </thead>
                 <tbody></tbody>
              </table>
         </div>
   </div>
+  </div>
 </section>
 </div>
 <!-- /.content-wrapper -->
+
+
+
+
 
 <?php include ('footer.php'); ?>
