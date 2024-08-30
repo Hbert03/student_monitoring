@@ -28,7 +28,7 @@ session_start();
     <div class="card-body login-card-body" style="border-radius:200px">
       <h4 style="color:black; font-family:'Bookman Old Style', Georgia, serif;" class="login-box-msg"><b><i>BONIFACIO NHS</i></b></h4>
       <div class="text-center">
-        <img src="img/logo.jpg" style="width:80%; position:relatives; border-radius:10px; margin-bottom:1em">
+        <img src="img/bnhs.jpg" style="width:80%; position:relatives; border-radius:10px; margin-bottom:1em">
       </div>
 
       <form action="login_function.php" method="post">

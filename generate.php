@@ -4,9 +4,11 @@ require 'phpqrcode/qrlib.php';
 if (isset($_POST['studentId']) && isset($_POST['studentName'])) {
     $studentId = $_POST['studentId'];
     $studentName = $_POST['studentName'];
-    $qrText = "Student ID: " . $studentId . "\nName: " . $studentName;
+    
+   
+    $qrText = "Student ID: " . $studentId . " Name: " . $studentName;
 
-    // Extract first and last name
+    
     $nameParts = explode(' ', $studentName);
     $firstName = $nameParts[0];
     $lastName = end($nameParts); 

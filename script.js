@@ -1445,3 +1445,86 @@ $('#classSched').on('click', 'button.view', function(){
         ],
     });
 });
+
+
+
+$('#attendance').DataTable({
+        serverSide: true,
+        lengthChange: true,
+        responsive: true,
+        autoWidth: false,
+        ajax: {
+            url: "fetch_data.php",
+            type: "POST",
+            data: {attendance: true},
+            error: function(xhr, error, thrown) {
+                console.log("Ajax Failed: " + thrown);
+            }
+        },
+        columns: [
+            { "data": "date" },
+            {"data": "fullname"},
+            {"data": "status"},
+        ],
+    });
+
+
+
+    $(document).ready(function () {
+        let qrInputTimeout = null;
+    
+        $('#qrInput').on('input', function () {
+            clearTimeout(qrInputTimeout);
+    
+
+            qrInputTimeout = setTimeout(function () {
+                var qrData = $('#qrInput').val().trim();
+ 
+                var studentIdMatch = qrData.match(/Student ID:\s*(\d+)/);
+                var studentId = studentIdMatch ? studentIdMatch[1] : null;
+    
+                if (studentId) {
+                    $.ajax({
+                        url: 'insert.php',
+                        type: 'POST',
+                        data: {
+                            student_id: studentId
+                        },
+                        success: function (response) {
+                            $('#result').html('<div class="alert alert-success">' + response + '</div>');
+                            
+                     
+                            setTimeout(function () {
+                                $('#result').fadeOut('slow', function() {
+                                    $(this).html('').show(); 
+                                });
+                            }, 3000);
+                        },
+                        error: function () {
+                            $('#result').html('<div class="alert alert-danger">Error saving attendance.</div>');
+                            
+                      
+                            setTimeout(function () {
+                                $('#result').fadeOut('slow', function() {
+                                    $(this).html('').show(); 
+                                });
+                            }, 3000);
+                        }
+                    });
+                } else {
+                    $('#result').html('<div class="alert alert-danger">Invalid QR Code data.</div>');
+                    
+                   
+                    setTimeout(function () {
+                        $('#result').fadeOut('slow', function() {
+                            $(this).html('').show(); 
+                        });
+                    }, 3000);
+                }
+    
+               
+                $('#qrInput').val('');
+            }, 500);
+        });
+    });
+    

@@ -64,8 +64,6 @@ if (isset($_POST['save'])) {
     $conn->close();
 }
 
-
-
 if (isset($_POST['save_teacher'])) {
 
     $firstname = $_POST['firstname'];
@@ -84,10 +82,8 @@ if (isset($_POST['save_teacher'])) {
         $result = $checkStmt->get_result();
 
         if ($result->num_rows > 0) {
-           
             echo json_encode(["success" => false, "message" => "Teacher already exists."]);
         } else {
-           
             $query = "INSERT INTO teacher (teacher_firstname, teacher_middlename, teacher_lastname, teacher_address, teacher_mobile, teacher_status) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
 
@@ -95,13 +91,15 @@ if (isset($_POST['save_teacher'])) {
                 $stmt->bind_param("ssssss", $firstname, $middlename, $lastname, $address, $mobile, $status);
                 if ($stmt->execute()) {
                     $teacher_id = $stmt->insert_id;
-                    $email = strtolower($firstname . '.' . $lastname) . '@bnhs.gov.ph';
-                    $password = 'password';
+
+                    // Remove spaces in the first name
+                    $cleaned_firstname = strtolower(str_replace(' ', '', $firstname));
+                    $email = $cleaned_firstname . '.' . strtolower($lastname) . '@bnhs.gov.ph';
                     
+                    $password = 'password';  // Default password, you can change this
                     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
                     $role = 1; 
-                    
-                 
+
                     $query = "INSERT INTO users (email, password, role, teacher_id) VALUES (?, ?, ?, ?)";
                     $stmt = $conn->prepare($query);
 
@@ -123,6 +121,7 @@ if (isset($_POST['save_teacher'])) {
         }
     }
 }
+
 
 
 
@@ -256,5 +255,9 @@ if (isset($_POST['addsubject'])) {
 
     $conn->close();
 }
+
+
+
+
 
 ?>

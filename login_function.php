@@ -19,8 +19,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['teacher_id'] = $user['teacher_id'];
 
-            header("Location: index.php");
+            if ($user['role'] == 1) {
+                header("Location: t_index.php");
+            } else {
+                header("Location: index.php");
+            }
             exit();
         } else {
             $_SESSION['login'] = "Invalid password!";

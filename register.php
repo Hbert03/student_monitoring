@@ -19,7 +19,7 @@
     <div class="card-body login-card-body">
       <h4 class="login-box-msg"><b><i>BONIFACIO NHS</i></b></h4>
       <div class="text-center">
-        <img src="img/logo.jpg" style="width:80%; position:relatives; border-radius:10px; margin-bottom:1em">
+        <img src="img/bnhs.jpg" style="width:80%; position:relatives; border-radius:10px; margin-bottom:1em">
       </div>
 
       <form action="register_function.php" method="post">

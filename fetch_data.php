@@ -1,8 +1,10 @@
 <?php
+session_start();
 include('database.php');
 require 'phpqrcode/qrlib.php';
-if (isset($_POST['fetch'])) {
 
+
+if (isset($_POST['fetch'])) {
     function getDataTable($draw, $start, $length, $search, $gradeLevel) {
         global $conn;
 
@@ -91,6 +93,8 @@ if (isset($_POST['fetch'])) {
     echo getDataTable($draw, $start, $length, $search, $gradeLevel);    
     exit();
 }
+
+
 
 if (isset($_POST['fetch_teacher'])) {
 
@@ -574,6 +578,91 @@ if (isset($_POST['viewstudent'])) {
     $teacher_id = $_POST["teacher_id"];
 
     echo getDataTable($draw, $start, $length, $search, $teacher_id);    
+    exit();
+}
+
+
+
+
+
+if (isset($_POST['attendance'])) {
+
+    function getAttendanceData($draw, $start, $length, $search, $teacher_id) {
+        global $conn;
+        global $teacher_id;
+
+        $sortableColumns = array('fullname', 'date', 'in_out_status'); 
+        
+        $orderBy = $sortableColumns[0];
+        $orderDir = 'ASC';
+
+        if (isset($_POST['order'][0]['column']) && isset($_POST['order'][0]['dir'])) {
+            $columnIdx = intval($_POST['order'][0]['column']);
+            $orderDir = $_POST['order'][0]['dir'];
+
+            if (isset($sortableColumns[$columnIdx])) {
+                $orderBy = $sortableColumns[$columnIdx];
+            }
+        }
+
+   
+        $query = "SELECT a.*, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname 
+                  FROM attendance a
+                  INNER JOIN student st ON a.student_id = st.student_id
+                  INNER JOIN class_schedule cs ON a.class_schedule_id = cs.class_schedule_id
+                  WHERE cs.teacher_id = ?";
+
+        if (!empty($search)) {
+            $escapedSearch = $conn->real_escape_string($search);
+            $query .= " AND (st.student_firstname LIKE '%$escapedSearch%' OR st.student_lastname LIKE '%$escapedSearch%')";
+        }
+
+        $query .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
+
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $teacher_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $totalQuery = "SELECT COUNT(*) AS total_count 
+                       FROM attendance a
+                       INNER JOIN student st ON a.student_id = st.student_id
+                       INNER JOIN class_schedule cs ON a.class_schedule_id = cs.class_schedule_id
+                       WHERE cs.teacher_id = ?";
+        
+        if (!empty($search)) {
+            $totalQuery .= " AND (st.student_firstname LIKE '%$escapedSearch%' OR st.student_lastname LIKE '%$escapedSearch%')";
+        }
+
+        $stmtTotal = $conn->prepare($totalQuery);
+        $stmtTotal->bind_param('i', $teacher_id);
+        $stmtTotal->execute();
+        $totalResult = $stmtTotal->get_result();
+        $totalRow = $totalResult->fetch_assoc();
+        $totalRecords = $totalRow['total_count'];
+
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => intval($draw),
+            "recordsTotal" => intval($totalRecords),
+            "recordsFiltered" => intval($totalRecords), 
+            "data" => $data
+        );
+
+        return json_encode($output);
+    }
+
+    $draw = $_POST["draw"];
+    $start = $_POST["start"];
+    $length = $_POST["length"];
+    $search = isset($_POST["search"]["value"]) ? $_POST["search"]["value"] : '';
+    $teacher_id = $_SESSION["teacher_id"];
+
+    echo getAttendanceData($draw, $start, $length, $search, $teacher_id);
     exit();
 }
 
