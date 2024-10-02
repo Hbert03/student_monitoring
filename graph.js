@@ -9,11 +9,11 @@ function fetchData() {
             var data = JSON.parse(xhr.responseText);
             updateChart(data); 
         } else {
-            console.error('Failed to fetch data: ' + xhr.status);
+     
         }
     };
     xhr.onerror = function() {
-        console.error('Failed to fetch data');
+     
     };
     xhr.send();
 }

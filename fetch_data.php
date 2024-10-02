@@ -609,7 +609,8 @@ if (isset($_POST['attendance'])) {
         $query = "SELECT a.*, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname 
                   FROM attendance a
                   INNER JOIN student st ON a.student_id = st.student_id
-                  INNER JOIN class_schedule cs ON a.class_schedule_id = cs.class_schedule_id
+                  INNER JOIN student_section ss ON a.student_id = ss.student_id
+				INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
                   WHERE cs.teacher_id = ?";
 
         if (!empty($search)) {
@@ -625,10 +626,11 @@ if (isset($_POST['attendance'])) {
         $result = $stmt->get_result();
 
         $totalQuery = "SELECT COUNT(*) AS total_count 
-                       FROM attendance a
-                       INNER JOIN student st ON a.student_id = st.student_id
-                       INNER JOIN class_schedule cs ON a.class_schedule_id = cs.class_schedule_id
-                       WHERE cs.teacher_id = ?";
+                        FROM attendance a
+                  INNER JOIN student st ON a.student_id = st.student_id
+                  INNER JOIN student_section ss ON a.student_id = ss.student_id
+				    INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
+                  WHERE cs.teacher_id = ?";
         
         if (!empty($search)) {
             $totalQuery .= " AND (st.student_firstname LIKE '%$escapedSearch%' OR st.student_lastname LIKE '%$escapedSearch%')";

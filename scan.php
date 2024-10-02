@@ -57,6 +57,7 @@
             width: 100%;
             padding: 10px;
             font-size: 16px;
+            border:1px solid gray;
         }
         #result {
             margin-top: 20px;
@@ -77,10 +78,9 @@
     <h1><b>ATTENDACE</b></h1>
   </div>
   <section class="">
-  <div class="container">
-        <h1>SCAN HERE!</h1>
-        <input type="text" id="qrInput" placeholder="Scan QR code here..." autofocus>
-        <div id="result"></div>
+  <div class="container" style="margin-bottom:10em">
+        <h1></h1>
+        <input class="form-control" type="text" id="qrInput" placeholder="Waiting....." autofocus>
     </div>
 
 </section>

@@ -889,7 +889,7 @@ $(document).ready(function() {
                                         if (response.trim() === "Updated Successfully") {
                                             Swal.fire(
                                                 'Updated!',
-                                                'File has been updated successfully.',
+                                                'Data has been updated successfully.',
                                                 'success'
                                             ).then(() => {
                                                 location.reload();
@@ -897,10 +897,13 @@ $(document).ready(function() {
                                         } else {
                                             Swal.fire(
                                                 'Failed!',
-                                                'Failed to update file.',
+                                                'Update Failed..Please select Grade Level to update student.',
                                                 'error'
-                                            );
+                                            ).then(() => {
+                                                location.reload();
+                                            });
                                         }
+
                                     }
                                 });
                             } else {
@@ -1491,38 +1494,24 @@ $('#attendance').DataTable({
                             student_id: studentId
                         },
                         success: function (response) {
-                            $('#result').html('<div class="alert alert-success">' + response + '</div>');
+                           toastr.success("Success!");
                             
                      
-                            setTimeout(function () {
-                                $('#result').fadeOut('slow', function() {
-                                    $(this).html('').show(); 
-                                });
-                            }, 3000);
                         },
                         error: function () {
-                            $('#result').html('<div class="alert alert-danger">Error saving attendance.</div>');
+                            toastr.error("QRcode Invalid");
                             
                       
-                            setTimeout(function () {
-                                $('#result').fadeOut('slow', function() {
-                                    $(this).html('').show(); 
-                                });
-                            }, 3000);
+                          
                         }
                     });
                 } else {
-                    $('#result').html('<div class="alert alert-danger">Invalid QR Code data.</div>');
+                   toastr.error("Contact Your Administrator");
                     
                    
-                    setTimeout(function () {
-                        $('#result').fadeOut('slow', function() {
-                            $(this).html('').show(); 
-                        });
-                    }, 3000);
+               
                 }
     
-               
                 $('#qrInput').val('');
             }, 500);
         });
