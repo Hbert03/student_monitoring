@@ -22,15 +22,8 @@
   "support": {
     "issues": "https://github.com/ColorlibHQ/AdminLTE/issues"
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/semaphoreci/semaphore-php"
-    }
-  ],
+  "minimum-stability": "dev",
   "require": {
-    "semaphore/semaphore-php": "dev-main" 
-  },
-  "minimum-stability": "dev"
+    "phpmailer/phpmailer": "dev-master"
+  }
 }
-
