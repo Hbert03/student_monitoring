@@ -1517,3 +1517,37 @@ $('#attendance').DataTable({
         });
     });
     
+
+    $(document).ready(function(){
+    
+        function checkTime() {
+            var currentTime = new Date();
+            var hours = currentTime.getHours();
+            var minutes = currentTime.getMinutes();
+            var seconds = currentTime.getSeconds();
+            
+            // Trigger at exactly 12:00:00 PM or 5:00:00 PM
+            if ((hours === 12 && minutes === 0 && seconds === 0) || 
+                (hours === 17 && minutes === 0 && seconds === 0)) {
+                console.log("Triggering missed scan notifications...");
+                sendNotifications(); 
+            }
+        }
+
+ 
+        function sendNotifications() {
+            $.ajax({
+                url: 'missed_scan.php', 
+                method: 'GET',
+                success: function(response) {
+                    console.log('Response from server:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error occurred:', error);
+                }
+            });
+        }
+
+    
+        setInterval(checkTime, 1000);
+    });
