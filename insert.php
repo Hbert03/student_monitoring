@@ -73,10 +73,10 @@ if ($status != 'Invalid attendance time.') {
         } elseif ($status == 'IN') {
             if ($current_time >= $attendance_windows['morning_in'][0] && $current_time <= $attendance_windows['morning_in'][1]) {
               
-                $message = "Good day! $parent_name, your student $parent_student has logged in for the morning class.";
+                $message = "Good day! $parent_name, your student $parent_student is present for the morning class.";
             } elseif ($current_time >= $attendance_windows['afternoon_in'][0] && $current_time <= $attendance_windows['afternoon_in'][1]) {
             
-                $message = "Good day! $parent_name, your student $parent_student has logged in for the afternoon class.";
+                $message = "Good day! $parent_name, your student $parent_student is present for the afternoon class.";
             }
         } elseif ($status == 'OUT') {
             if ($current_time >= $attendance_windows['morning_out'][0] && $current_time <= $attendance_windows['morning_out'][1]) {
