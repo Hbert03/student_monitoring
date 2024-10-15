@@ -1,7 +1,7 @@
 <?php
 include('database.php');
 
-// API key for sending SMS
+
 $apiKey = 'f770208e20af697387421fcf32ba90da';
 
 // Define the time windows
