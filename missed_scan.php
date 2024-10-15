@@ -15,8 +15,7 @@ $current_time = date('H:i:s');
 $current_date = date('Y-m-d');
 
 // Query to find students who haven't scanned at all today
-$missed_sql = "
-    SELECT s.student_id, p.parent_name, p.parent_mobile, 
+$missed_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, 
            CONCAT(s.student_firstname, ' ', s.student_lastname) AS student
     FROM student_section ss
     INNER JOIN student s ON ss.student_id = s.student_id
@@ -77,8 +76,7 @@ while ($missed_row = $missed_result->fetch_assoc()) {
 }
 
 // Query to find students who logged in the morning but missed the afternoon
-$missed_afternoon_sql = "
-    SELECT s.student_id, p.parent_name, p.parent_mobile, 
+$missed_afternoon_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, 
            CONCAT(s.student_firstname, ' ', s.student_lastname) AS student
     FROM student_section ss
     INNER JOIN student s ON ss.student_id = s.student_id
