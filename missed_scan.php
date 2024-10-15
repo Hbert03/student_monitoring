@@ -1,6 +1,8 @@
 <?php
 include('database.php');
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 $apiKey = 'f770208e20af697387421fcf32ba90da';
 
@@ -22,8 +24,11 @@ $missed_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile,
     INNER JOIN parent p ON s.parent_id = p.parent_id
     WHERE ss.school_year_id = (SELECT school_year_id FROM school_year ORDER BY school_year_id DESC LIMIT 1)
     AND s.student_id NOT IN (SELECT student_id FROM attendance WHERE date = ?)";
-    
+
 $missed_stmt = $conn->prepare($missed_sql);
+if (!$missed_stmt) {
+    die("Error preparing missed scans SQL: " . $conn->error);
+}
 $missed_stmt->bind_param("s", $current_date);
 $missed_stmt->execute();
 $missed_result = $missed_stmt->get_result();
@@ -39,7 +44,6 @@ while ($missed_row = $missed_result->fetch_assoc()) {
         $missed_parent_mobile = '+63' . substr($missed_parent_mobile, 1); 
     }
 
-   
     $missed_message = '';
     if ($current_time <= $morning_window_end) {
         $missed_message = "Good day! $missed_parent_name, your student $missed_student is absent in the morning class.";
@@ -63,15 +67,22 @@ while ($missed_row = $missed_result->fetch_assoc()) {
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($missed_parameters));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, true);
 
         $output_missed = curl_exec($ch);
+        if ($output_missed === false) {
+            echo "cURL Error: " . curl_error($ch);
+        } else {
+            $response_missed = json_decode($output_missed, true);
+            if (isset($response_missed['status']) && $response_missed['status'] == 'success') {
+                echo "SMS sent successfully!";
+            } else {
+                echo "Failed to send SMS. Response: <pre>";
+                print_r($response_missed);
+                echo "</pre>";
+            }
+        }
         curl_close($ch);
-
-        // Debug response
-        $response_missed = json_decode($output_missed, true);
-        echo "Missed Scan Notification Response: <pre>";
-        print_r($response_missed);
-        echo "</pre>";
     }
 }
 
@@ -84,14 +95,17 @@ $missed_afternoon_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile,
     WHERE ss.school_year_id = (SELECT school_year_id FROM school_year ORDER BY school_year_id DESC LIMIT 1)
     AND s.student_id IN (
         SELECT student_id FROM attendance 
-        WHERE date = ? AND time < ?
+        WHERE DATE(date) = ? AND TIME(date) < ?
     )
     AND s.student_id NOT IN (
         SELECT student_id FROM attendance 
-        WHERE date = ? AND time >= ?
-    )";
+        WHERE DATE(date) = ? AND TIME(date) >= ?)";
+
 
 $missed_afternoon_stmt = $conn->prepare($missed_afternoon_sql);
+if (!$missed_afternoon_stmt) {
+    die("Error preparing missed afternoon SQL: " . $conn->error);
+}
 $missed_afternoon_stmt->bind_param("ssss", $current_date, $morning_window_end, $current_date, $afternoon_start);
 $missed_afternoon_stmt->execute();
 $missed_afternoon_result = $missed_afternoon_stmt->get_result();
@@ -107,7 +121,6 @@ while ($missed_afternoon_row = $missed_afternoon_result->fetch_assoc()) {
         $missed_parent_mobile = '+63' . substr($missed_parent_mobile, 1); 
     }
 
-  
     $missed_message = "Good day! $missed_parent_name, your student $missed_student is absent in the afternoon class.";
 
     $ch = curl_init();
@@ -122,18 +135,26 @@ while ($missed_afternoon_row = $missed_afternoon_result->fetch_assoc()) {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($missed_parameters));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_VERBOSE, true);
 
     $output_missed = curl_exec($ch);
+    if ($output_missed === false) {
+        echo "cURL Error: " . curl_error($ch);
+    } else {
+        $response_missed = json_decode($output_missed, true);
+        if (isset($response_missed['status']) && $response_missed['status'] == 'success') {
+            echo "SMS sent successfully!";
+        } else {
+            echo "Failed to send SMS. Response: <pre>";
+            print_r($response_missed);
+            echo "</pre>";
+        }
+    }
     curl_close($ch);
-
-    // Debug response
-    $response_missed = json_decode($output_missed, true);
-    echo "Missed Afternoon Scan Notification Response: <pre>";
-    print_r($response_missed);
-    echo "</pre>";
 }
 
 $missed_stmt->close();
 $missed_afternoon_stmt->close();
 $conn->close();
+
 ?>

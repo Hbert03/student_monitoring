@@ -1518,26 +1518,26 @@ $('#attendance').DataTable({
     });
     
 
-    $(document).ready(function(){
     
-        function checkTime() {
-            var currentTime = new Date();
-            var hours = currentTime.getHours();
-            var minutes = currentTime.getMinutes();
-            var seconds = currentTime.getSeconds();
-            
-            // Trigger at exactly 12:00:00 PM or 5:00:00 PM
-            if ((hours === 12 && minutes === 0 && seconds === 0) || 
+
+    $(document).ready(function() {
+        setInterval(function() {
+            var now = new Date();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+    
+            // Check if it's exactly 12:00:00 PM or 5:00:00 PM
+            if ((hours === 12 && minutes === 0 && seconds === 0) ||
                 (hours === 17 && minutes === 0 && seconds === 0)) {
                 console.log("Triggering missed scan notifications...");
-                sendNotifications(); 
+                sendNotifications();
             }
-        }
-
- 
+        }, 1000); 
+    
         function sendNotifications() {
             $.ajax({
-                url: 'missed_scan.php', 
+                url: 'missed_scan.php',
                 method: 'GET',
                 success: function(response) {
                     console.log('Response from server:', response);
@@ -1547,7 +1547,5 @@ $('#attendance').DataTable({
                 }
             });
         }
-
-    
-        setInterval(checkTime, 1000);
     });
+    
