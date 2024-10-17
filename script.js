@@ -1521,20 +1521,29 @@ $('#attendance').DataTable({
     
 
     $(document).ready(function() {
-        setInterval(function() {
+        function checkAndSendNotifications() {
             var now = new Date();
             var hours = now.getHours();
             var minutes = now.getMinutes();
             var seconds = now.getSeconds();
     
-            // Check if it's exactly 12:00:00 PM or 5:00:00 PM
+            // Trigger at exactly 12:00:00 PM or 5:00:00 PM
             if ((hours === 12 && minutes === 0 && seconds === 0) ||
                 (hours === 17 && minutes === 0 && seconds === 0)) {
                 console.log("Triggering missed scan notifications...");
                 sendNotifications();
-            }
-        }, 1000); 
     
+       
+                setTimeout(function() {
+                    console.log("Waiting next scheduled time...");
+                }, 60000); 
+            }
+        }
+    
+        // Call function every second
+        setInterval(checkAndSendNotifications, 1000); 
+    
+        // Function to send notifications
         function sendNotifications() {
             $.ajax({
                 url: 'missed_scan.php',
@@ -1543,7 +1552,7 @@ $('#attendance').DataTable({
                     console.log('Response from server:', response);
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error occurred:', error);
+                    console.error('Error occurred while sending notifications:', error);
                 }
             });
         }
