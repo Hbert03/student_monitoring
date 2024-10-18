@@ -746,6 +746,7 @@ $(document).ready(function() {
 
    
     var table = $('#student').DataTable({
+   
         serverSide: true,
         lengthChange: true,
         responsive: true,
@@ -761,6 +762,10 @@ $(document).ready(function() {
                 console.log("Ajax Failed: " + thrown);
             }
         },
+        dom: 'lBfrtip', 
+        buttons: [
+            'copy', 'excel' 
+        ],
         columns: [
             { "data": "fullname" },
             { "data": "student_mobile" },
