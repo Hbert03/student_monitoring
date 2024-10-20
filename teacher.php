@@ -32,6 +32,7 @@ include ('header.php');
                       <tr>
                         <th>Name</th>
                         <th>Address</th>
+                        <th>User Email</th>
                         <th>Mobile Number</th>
                         <th>Status</th>
                         <th colspan="2">Action</th>

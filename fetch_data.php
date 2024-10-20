@@ -115,7 +115,7 @@ if (isset($_POST['fetch_teacher'])) {
             }
         }
 
-        $query1 = "SELECT *, CONCAT(teacher_firstname, ' ', COALESCE(SUBSTRING(teacher_middlename, 1, 1), ''), '. ', teacher_lastname) AS fullname FROM teacher WHERE 1=1";
+        $query1 = "SELECT t1.*, CONCAT(t1.teacher_firstname, ' ', COALESCE(SUBSTRING(t1.teacher_middlename, 1, 1), ''), '. ', t1.teacher_lastname) AS fullname, t.email FROM teacher t1 INNER JOIN users t ON t.teacher_id = t1.teacher_id WHERE 1=1";
 
         if (!empty($search)) {
             $escapedSearch = $conn->real_escape_string($search);
@@ -611,7 +611,7 @@ if (isset($_POST['attendance'])) {
                   INNER JOIN student st ON a.student_id = st.student_id
                   INNER JOIN student_section ss ON a.student_id = ss.student_id
 				INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
-                  WHERE cs.teacher_id = ?";
+                  WHERE cs.teacher_id = ? AND DATE(a.date) = CURDATE()";
 
         if (!empty($search)) {
             $escapedSearch = $conn->real_escape_string($search);
@@ -630,7 +630,7 @@ if (isset($_POST['attendance'])) {
                   INNER JOIN student st ON a.student_id = st.student_id
                   INNER JOIN student_section ss ON a.student_id = ss.student_id
 				    INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
-                  WHERE cs.teacher_id = ?";
+                  WHERE cs.teacher_id = ? AND DATE(a.date) = CURDATE()";
         
         if (!empty($search)) {
             $totalQuery .= " AND (st.student_firstname LIKE '%$escapedSearch%' OR st.student_lastname LIKE '%$escapedSearch%')";

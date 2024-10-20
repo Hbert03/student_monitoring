@@ -94,7 +94,7 @@ if (!isset($_SESSION['user_id'])) {
           <img src="img/profile.jpg" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-        <a href="#" class="d-block"><?php echo $_SESSION['email']; ?></a>
+        <a href="#" class="d-block"><?php echo $_SESSION['role']; ?></a>
         </div>
       </div>
 

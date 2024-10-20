@@ -988,6 +988,7 @@ $(document).ready(function(){
         columns: [
             { "data": "fullname" },
             { "data": "teacher_address" },
+            { "data": "email" },
             { "data": "teacher_mobile" },
             { 
                "data": "teacher_status"
