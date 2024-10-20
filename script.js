@@ -746,7 +746,6 @@ $(document).ready(function() {
 
    
     var table = $('#student').DataTable({
-   
         serverSide: true,
         lengthChange: true,
         responsive: true,
@@ -762,10 +761,6 @@ $(document).ready(function() {
                 console.log("Ajax Failed: " + thrown);
             }
         },
-        dom: 'lBfrtip', 
-        buttons: [
-            'copy', 'excel' 
-        ],
         columns: [
             { "data": "fullname" },
             { "data": "student_mobile" },
@@ -1523,42 +1518,66 @@ $('#attendance').DataTable({
     });
     
 
-    
 
-    $(document).ready(function() {
-        function checkAndSendNotifications() {
+    function showTime() {
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric', 
+            hour: 'numeric', 
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true 
+        };
+        
+    
+        const systemTime = new Intl.DateTimeFormat('en-US', options).format(new Date());
+        document.getElementById("dateTime").innerText = systemTime;
+    }
+
+    setInterval(showTime, 1000); 
+
+    window.onload = showTime;
+
+
+
+
+    $(document).ready(function () {
+        setInterval(function () {
             var now = new Date();
             var hours = now.getHours();
             var minutes = now.getMinutes();
             var seconds = now.getSeconds();
     
-            // Trigger at exactly 12:00:00 PM or 5:00:00 PM
+            // Check if it's exactly 12:00:00 PM, 2:00:00 PM, or 5:00:00 PM
             if ((hours === 12 && minutes === 0 && seconds === 0) ||
+                (hours === 14 && minutes === 0 && seconds === 0) ||
                 (hours === 17 && minutes === 0 && seconds === 0)) {
                 console.log("Triggering missed scan notifications...");
-                sendNotifications();
-    
-       
-                setTimeout(function() {
-                    console.log("Waiting next scheduled time...");
-                }, 60000); 
+                sendNotifications(hours);
             }
-        }
+        }, 1000);
     
-        // Call function every second
-        setInterval(checkAndSendNotifications, 1000); 
+        function sendNotifications(hour) {
+            // Define task based on the hour
+            let task;
+            if (hour === 12) {
+                task = 'morning';
+            } else if (hour === 14) {
+                task = 'afternoon';
+            } else if (hour === 17) {
+                task = 'evening';
+            }
     
-        // Function to send notifications
-        function sendNotifications() {
+            // Send AJAX request with the task parameter
             $.ajax({
                 url: 'missed_scan.php',
                 method: 'GET',
-                success: function(response) {
+                data: { task: task },
+                success: function (response) {
                     console.log('Response from server:', response);
                 },
-                error: function(xhr, status, error) {
-                    console.error('Error occurred while sending notifications:', error);
-                }
             });
         }
     });

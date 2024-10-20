@@ -71,17 +71,20 @@
 
 
 <!-- Content Wrapper. Contains page content -->
+ <div class="float-right" style="margin-top:-4em">
+  <a id="dateTime" style="font-size:20px; font-weight:bold; margin-bottom:-10em; color:blue"></a>
+</div>
 <div class="card" style="margin-top:5em; border-top:3px solid skyblue">
   <div class="text-center mt-2">
     <img style="width:200px; height:200px" src="img/bnhs.jpg">
   </div>
   <div style="text-align:center">
-    <h1><b>ATTENDACE</b></h1>
+    <h1><b>ATTENDANCE AREA</b></h1>
   </div>
   <section class="">
-  <div class="container" style="margin-bottom:10em">
+  <div class="container" style="">
         <h1></h1>
-        <input class="form-control" type="text" id="qrInput" placeholder="Waiting....." autofocus>
+        <input class="form-control" type="text" style="margin-bottom: 17em" id="qrInput" placeholder="Waiting....." autofocus>
     </div>
 
 </section>
