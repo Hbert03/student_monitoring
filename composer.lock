@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "81599d155477aef45693acd65e6e46ad5d3d4996"
+                "reference": "611235697c399a2f15137e994892c4126cab6948"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/81599d155477aef45693acd65e6e46ad5d3d4996",
-                "reference": "81599d155477aef45693acd65e6e46ad5d3d4996",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/611235697c399a2f15137e994892c4126cab6948",
+                "reference": "611235697c399a2f15137e994892c4126cab6948",
                 "shasum": ""
             },
             "require": {
@@ -86,7 +86,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-09-18T14:27:31+00:00"
+            "time": "2024-10-21T09:42:14+00:00"
         }
     ],
     "packages-dev": [],

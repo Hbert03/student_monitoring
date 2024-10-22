@@ -1,5 +1,6 @@
 <?php
 include('database.php');
+require 'vendor/autoload.php'; 
 
 $apiKey = 'f770208e20af697387421fcf32ba90da';
 $student_id = intval($_POST['student_id']);
@@ -38,7 +39,7 @@ echo "Current Time: $current_time, Status: $status<br>";
 
 if ($status != 'Invalid attendance time.') {
     // Fetch parent details
-    $sql = "SELECT t.parent_mobile, t.parent_name, CONCAT(s.student_firstname, ' ', s.student_lastname ) as student 
+    $sql = "SELECT t.parent_mobile, t.parent_name, t.email, CONCAT(s.student_firstname, ' ', s.student_lastname ) as student 
             FROM parent t 
             INNER JOIN student s ON s.parent_id = t.parent_id 
             WHERE s.student_id = ?";
@@ -52,14 +53,16 @@ if ($status != 'Invalid attendance time.') {
     if ($parent) {
         $parent_name = $parent['parent_name'];
         $parent_mobile = $parent['parent_mobile'];
+        $parent_email = $parent['email'];
         $parent_student = $parent['student'];
-        
+
         // Format the mobile number
         if (strpos($parent_mobile, '0') === 0) {
             $parent_mobile = '+63' . substr($parent_mobile, 1); 
         }
 
-        // Construct SMS message based on the attendance status
+        // Construct SMS and Email message based on the attendance status
+        $message = '';
         if ($status == 'LATE') {
             if ($current_time > $attendance_windows['morning_in'][1] && $current_time < $attendance_windows['morning_out'][0]) {
                 $message = "Good day! $parent_name, your student $parent_student is present but late for the morning class.";
@@ -96,6 +99,33 @@ if ($status != 'Invalid attendance time.') {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $output = curl_exec($ch);
         curl_close($ch);
+
+        // Send Email using PHPMailer
+        $mail = new PHPMailer\PHPMailer\PHPMailer();
+        try {
+            //Server settings
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'bertslayerlimot@gmail.com'; // Replace with your Gmail email
+            $mail->Password = '03312000'; // Replace with your Gmail password or app password
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = 587;
+
+            //Recipients
+            $mail->setFrom('bertslayerlimot@gmail.com', 'BNHSAdmin');
+            $mail->addAddress($parent_email); // Add a recipient
+
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = 'Attendance Notification';
+            $mail->Body = $message;
+
+            $mail->send();
+            echo 'Email has been sent<br>';
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
 
         // Decode response and debug
         $response = json_decode($output, true);

@@ -3,7 +3,7 @@
         'name' => 'almasaeed2010/adminlte',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b2f50b1ca3aef62c9f260bd9092e170c43adcac9',
+        'reference' => 'eb5376a295f751a057a67817e19099a9b68f2666',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'almasaeed2010/adminlte' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b2f50b1ca3aef62c9f260bd9092e170c43adcac9',
+            'reference' => 'eb5376a295f751a057a67817e19099a9b68f2666',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -22,7 +22,7 @@
         'phpmailer/phpmailer' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '81599d155477aef45693acd65e6e46ad5d3d4996',
+            'reference' => '611235697c399a2f15137e994892c4126cab6948',
             'type' => 'library',
             'install_path' => __DIR__ . '/../phpmailer/phpmailer',
             'aliases' => array(
