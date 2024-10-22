@@ -7,9 +7,9 @@ ini_set('display_errors', 1);
 $apiKey = 'f770208e20af697387421fcf32ba90da';
 
 // Define time windows
-$morning_window_end = '12:00:00';
+$morning_window_end = '12:01:00';
 $afternoon_start = '13:00:00';
-$afternoon_window_end = '17:00:00';
+$afternoon_window_end = '17:01:00';
 
 date_default_timezone_set('Asia/Manila');
 $current_date = date('Y-m-d');

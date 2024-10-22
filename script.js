@@ -1552,9 +1552,9 @@ $('#attendance').DataTable({
             var seconds = now.getSeconds();
     
             // Check if it's exactly 12:00:00 PM, 2:00:00 PM, or 5:00:00 PM
-            if ((hours === 12 && minutes === 0 && seconds === 0) ||
+            if ((hours === 12 && minutes === 1 && seconds === 0) ||
                 (hours === 14 && minutes === 0 && seconds === 0) ||
-                (hours === 17 && minutes === 0 && seconds === 0)) {
+                (hours === 17 && minutes === 1 && seconds === 0)) {
                 console.log("Triggering missed scan notifications...");
                 sendNotifications(hours);
             }
