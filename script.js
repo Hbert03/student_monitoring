@@ -1470,7 +1470,25 @@ $('#attendance').DataTable({
         }
     },
     columns: [
-        { "data": "date" },
+        { 
+            "data": "date",
+            "render": function(data, type, row) {
+                if (type === "display" || type === "filter") {
+                    let dateObj = new Date(data);
+                    let options = {
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric', 
+                        hour: 'numeric', 
+                        minute: 'numeric',
+                        hour12: true
+                    };
+                   
+                    return new Intl.DateTimeFormat('en-US', options).format(dateObj);
+                }
+                return data; 
+            }
+        },
         { "data": "fullname" },
         { "data": "status" }
     ],

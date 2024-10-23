@@ -147,7 +147,7 @@ if (!isset($_SESSION['user_id'])) {
                       <tr>
                         <th>Date</th>
                         <th>Student</th>
-                        <th colspan="2">Action</th>
+                        <th colspan="2">Status</th>
                       </tr>
                     </thead>
                 <tbody></tbody>
