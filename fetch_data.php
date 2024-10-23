@@ -605,32 +605,49 @@ if (isset($_POST['attendance'])) {
             }
         }
 
-   
-        $query = "SELECT a.*, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname 
-                  FROM attendance a
-                  INNER JOIN student st ON a.student_id = st.student_id
-                  INNER JOIN student_section ss ON a.student_id = ss.student_id
-				INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
-                  WHERE cs.teacher_id = ? AND DATE(a.date) = CURDATE()";
+        $query = "WITH RankedAttendance AS (
+            SELECT 
+                a.*, 
+                CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname,
+                ROW_NUMBER() OVER (PARTITION BY a.student_id ORDER BY a.date ASC) AS row_num
+            FROM attendance a
+            INNER JOIN student st ON a.student_id = st.student_id
+            INNER JOIN student_section ss ON a.student_id = ss.student_id
+            INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
+            WHERE cs.teacher_id = ? AND DATE(a.date) = CURDATE()";
 
-        if (!empty($search)) {
-            $escapedSearch = $conn->real_escape_string($search);
-            $query .= " AND (st.student_firstname LIKE '%$escapedSearch%' OR st.student_lastname LIKE '%$escapedSearch%')";
-        }
+            if (!empty($search)) {
+                $escapedSearch = $conn->real_escape_string($search);
+                $query .= " AND (st.student_firstname LIKE '%$escapedSearch%' OR st.student_lastname LIKE '%$escapedSearch%')";
+            }
 
-        $query .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
+            $query .= ") 
+                    SELECT * 
+                    FROM RankedAttendance
+                    WHERE row_num = 1
+                    ORDER BY " . $orderBy . " " . $orderDir . " 
+                    LIMIT " . intval($start) . ", " . intval($length);
 
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $teacher_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $teacher_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        $totalQuery = "SELECT COUNT(*) AS total_count 
-                        FROM attendance a
-                  INNER JOIN student st ON a.student_id = st.student_id
-                  INNER JOIN student_section ss ON a.student_id = ss.student_id
-				    INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
-                  WHERE cs.teacher_id = ? AND DATE(a.date) = CURDATE()";
+
+        $totalQuery = "WITH RankedAttendance AS (
+                    SELECT 
+                        a.student_id, 
+                        ROW_NUMBER() OVER (PARTITION BY a.student_id ORDER BY a.date ASC) AS row_num
+                    FROM attendance a
+                    INNER JOIN student st ON a.student_id = st.student_id
+                    INNER JOIN student_section ss ON a.student_id = ss.student_id
+                    INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
+                    WHERE cs.teacher_id = ? AND DATE(a.date) = CURDATE()
+                )
+                    SELECT COUNT(*) AS total_count
+                    FROM RankedAttendance
+                    WHERE row_num = 1;
+                    ";
         
         if (!empty($search)) {
             $totalQuery .= " AND (st.student_firstname LIKE '%$escapedSearch%' OR st.student_lastname LIKE '%$escapedSearch%')";

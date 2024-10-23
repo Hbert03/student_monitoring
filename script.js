@@ -1453,24 +1453,28 @@ $('#classSched').on('click', 'button.view', function(){
 
 
 $('#attendance').DataTable({
-        serverSide: true,
-        lengthChange: true,
-        responsive: true,
-        autoWidth: false,
-        ajax: {
-            url: "fetch_data.php",
-            type: "POST",
-            data: {attendance: true},
-            error: function(xhr, error, thrown) {
-                console.log("Ajax Failed: " + thrown);
-            }
-        },
-        columns: [
-            { "data": "date" },
-            {"data": "fullname"},
-            {"data": "status"},
-        ],
-    });
+    dom: 'Bfrtip', 
+    buttons: [
+     
+    ],
+    serverSide: true,
+    lengthChange: true,
+    responsive: true,
+    autoWidth: false,
+    ajax: {
+        url: "fetch_data.php",
+        type: "POST",
+        data: {attendance: true},
+        error: function(xhr, error, thrown) {
+            console.log("Ajax Failed: " + thrown);
+        }
+    },
+    columns: [
+        { "data": "date" },
+        { "data": "fullname" },
+        { "data": "status" }
+    ],
+});
 
 
 
