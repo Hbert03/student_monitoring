@@ -104,17 +104,19 @@ if ($status != 'Invalid attendance time.') {
         $mail = new PHPMailer\PHPMailer\PHPMailer();
         try {
             //Server settings
+            $mail->SMTPDebug = 2; 
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'bertslayerlimot@gmail.com'; // Replace with your Gmail email
-            $mail->Password = '03312000'; // Replace with your Gmail password or app password
-            $mail->SMTPSecure = 'tls';
-            $mail->Port = 587;
+            $mail->Username = 'bonifacionhsa@gmail.com';
+            $mail->Password = 'gccpharggeblqsmg'; 
+            $mail->SMTPSecure = 'ssl'; 
+            $mail->Port = 465;
+            
 
             //Recipients
-            $mail->setFrom('bertslayerlimot@gmail.com', 'BNHSAdmin');
-            $mail->addAddress($parent_email); // Add a recipient
+            $mail->setFrom('bonifacionhsa@gmail.com', 'BNHSAdmin');
+            $mail->addAddress($parent_email); 
 
             // Content
             $mail->isHTML(true);

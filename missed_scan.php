@@ -7,31 +7,31 @@ ini_set('display_errors', 1);
 $apiKey = 'f770208e20af697387421fcf32ba90da';
 
 // Define time windows
-$morning_window_end = '12:01:00';
-$afternoon_start = '13:00:00';
-$afternoon_window_end = '17:01:00';
+$morning_window_end = '12:02:00';
+$afternoon_start = '14:02:00';
+$afternoon_window_end = '17:02:00';
 
 date_default_timezone_set('Asia/Manila');
-$current_date = date('Y-m-d');
+$current_date = date('Y-m-d H:i:s');
 
 $task = isset($_GET['task']) ? $_GET['task'] : '';
 
 switch ($task) {
     case 'morning':
-        handleMorningTask($current_date, $morning_window_end, $afternoon_start);
+        handleMorningTask($current_date, $morning_window_end);
         break;
     case 'afternoon':
-        handleAfternoonTask($current_date, $afternoon_start, $afternoon_window_end);
+        handleAfternoonTask($current_date, $afternoon_start);
         break;
     case 'evening':
-        handleEveningTask($current_date);
+        handleEveningTask($current_date, $afternoon_window_end);
         break;
     default:
         echo "Invalid task specified.";
         break;
 }
 
-function handleMorningTask($current_date, $morning_window_end, $afternoon_start) {
+function handleMorningTask($current_date, $morning_window_end) {
     global $conn;
     
     // Query for missed morning logout
@@ -59,7 +59,7 @@ function handleMorningTask($current_date, $morning_window_end, $afternoon_start)
     }
     $missed_logout_stmt->close();
     
-    // Query for students who were absent in the morning class
+   
     $absent_morning_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, 
         CONCAT(s.student_firstname, ' ', s.student_lastname) AS student
         FROM student_section ss
@@ -81,7 +81,7 @@ function handleMorningTask($current_date, $morning_window_end, $afternoon_start)
     $absent_morning_stmt->close();
 }
 
-function handleAfternoonTask($current_date, $afternoon_start, $afternoon_window_end) {
+function handleAfternoonTask($current_date, $afternoon_start) {
     global $conn;
     $missed_afternoon_login_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, 
         CONCAT(s.student_firstname, ' ', s.student_lastname) AS student
@@ -104,7 +104,7 @@ function handleAfternoonTask($current_date, $afternoon_start, $afternoon_window_
     $missed_afternoon_login_stmt->close();
 }
 
-function handleEveningTask($current_date) {
+function handleEveningTask($current_date, $afternoon_window_end) {
     global $conn;
     $missed_both_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, 
         CONCAT(s.student_firstname, ' ', s.student_lastname) AS student
@@ -126,14 +126,18 @@ function handleEveningTask($current_date) {
     $missed_both_stmt->close();
 }
 
-function sendSMS($row, $message) {
+
+function sendNotification($row, $message) {
     global $apiKey;
     $parent_mobile = $row['parent_mobile'];
+    $parent_email = $row['email'];
     
+    // Format PH mobile number
     if (strpos($parent_mobile, '0') === 0) {
         $parent_mobile = '+63' . substr($parent_mobile, 1);
     }
 
+    // Send SMS
     $ch = curl_init();
     $parameters = array(
         'apikey' => $apiKey,
@@ -146,20 +150,38 @@ function sendSMS($row, $message) {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_VERBOSE, true);
 
     $output = curl_exec($ch);
-    if ($output === false) {
-        error_log("cURL Error: " . curl_error($ch));
-    } else {
-        $response = json_decode($output, true);
-        if (isset($response['status']) && $response['status'] == 'success') {
-            error_log("SMS sent successfully to {$parent_mobile}");
-        } else {
-            error_log("Failed to send SMS to {$parent_mobile}. Response: " . print_r($response, true));
+    curl_close($ch);
+
+    // Send Email using PHPMailer
+    if (!empty($parent_email)) {
+        $mail = new PHPMailer\PHPMailer\PHPMailer();
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'bonifacionhsa@gmail.com';
+            $mail->Password = 'gccpharggeblqsmg'; 
+            $mail->SMTPSecure = 'ssl'; 
+            $mail->Port = 465;
+
+            $mail->setFrom('bonifacionhsa@gmail.com', 'BNHSAdmin');
+            $mail->addAddress($parent_email);
+
+            $mail->isHTML(true);
+            $mail->Subject = 'Attendance Notification';
+            $mail->Body = $message;
+
+            if ($mail->send()) {
+                error_log("Email sent successfully to {$parent_email}");
+            } else {
+                error_log("Failed to send email to {$parent_email}. Error: " . $mail->ErrorInfo);
+            }
+        } catch (Exception $e) {
+            error_log("Mailer Error: {$mail->ErrorInfo}");
         }
     }
-    curl_close($ch);
 }
 
 $conn->close();
