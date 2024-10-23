@@ -1,6 +1,6 @@
 <?php 
 include('database.php');
-
+require 'vendor/autoload.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -35,7 +35,7 @@ function handleMorningTask($current_date, $morning_window_end) {
     global $conn;
     
     // Query for missed morning logout
-    $missed_logout_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, 
+    $missed_logout_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, p.email,
         CONCAT(s.student_firstname, ' ', s.student_lastname) AS student
         FROM student_section ss
         INNER JOIN student s ON ss.student_id = s.student_id
@@ -60,7 +60,7 @@ function handleMorningTask($current_date, $morning_window_end) {
     $missed_logout_stmt->close();
     
    
-    $absent_morning_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, 
+    $absent_morning_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, p.email,
         CONCAT(s.student_firstname, ' ', s.student_lastname) AS student
         FROM student_section ss
         INNER JOIN student s ON ss.student_id = s.student_id
@@ -83,7 +83,7 @@ function handleMorningTask($current_date, $morning_window_end) {
 
 function handleAfternoonTask($current_date, $afternoon_start) {
     global $conn;
-    $missed_afternoon_login_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, 
+    $missed_afternoon_login_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, p.email,
         CONCAT(s.student_firstname, ' ', s.student_lastname) AS student
         FROM student_section ss
         INNER JOIN student s ON ss.student_id = s.student_id
@@ -106,7 +106,7 @@ function handleAfternoonTask($current_date, $afternoon_start) {
 
 function handleEveningTask($current_date, $afternoon_window_end) {
     global $conn;
-    $missed_both_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, 
+    $missed_both_sql = "SELECT s.student_id, p.parent_name, p.parent_mobile, p.email,
         CONCAT(s.student_firstname, ' ', s.student_lastname) AS student
         FROM student_section ss
         INNER JOIN student s ON ss.student_id = s.student_id
@@ -127,7 +127,7 @@ function handleEveningTask($current_date, $afternoon_window_end) {
 }
 
 
-function sendNotification($row, $message) {
+function sendSMS($row, $message) {
     global $apiKey;
     $parent_mobile = $row['parent_mobile'];
     $parent_email = $row['email'];
