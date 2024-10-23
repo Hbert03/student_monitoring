@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 10, 2024 at 12:57 AM
+-- Generation Time: Oct 24, 2024 at 01:05 AM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.10
 
@@ -31,7 +31,7 @@ CREATE TABLE `attendance` (
   `attendance_id` int(11) NOT NULL,
   `date` datetime NOT NULL,
   `student_id` int(11) NOT NULL,
-  `status` enum('IN','OUT') NOT NULL
+  `status` enum('IN','OUT','LATE') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -305,7 +305,8 @@ CREATE TABLE `teacher` (
 
 INSERT INTO `teacher` (`teacher_id`, `teacher_firstname`, `teacher_middlename`, `teacher_lastname`, `teacher_address`, `teacher_mobile`, `teacher_status`) VALUES
 (20, 'Lucia', 'Lim', 'Limot', 'Lantungan', '09061266937', 'married'),
-(21, 'Honey Lee', 'Lim', 'Limot', 'Lantungan', '09061266937', 'married');
+(21, 'Honey Lee', 'Lim', 'Limot', 'Lantungan', '09061266937', 'married'),
+(24, 'Herbert', 'Lim', 'Limot', 'Lantungan', '09061266937', 'married');
 
 -- --------------------------------------------------------
 
@@ -329,7 +330,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `email`, `password`, `role`, `teacher_id`, `created_at`) VALUES
 (29, 'admin@bnhs', '$2y$10$1CAQwU4eXwO82HfObLdoZ.pkpDJri4o.RgODyyg.tgcztMeili/Ca', 'Admin', NULL, '2024-08-04 01:06:45'),
 (30, 'lucia.limot@bnhs.gov.ph', '$2y$10$9qQOvjIUeBaV3Cd4FNw2ZuwzVuZlYQZ5oYsYa6RyNs7JaCxRf9L2C', '1', 20, '2024-08-04 01:08:22'),
-(31, 'honey lee.limot@bnhs.gov.ph', '$2y$10$BAHxn6Z0k7rG9NGid.ohj.jlpCwR3vu7gqwhypPVshSXeDURjcR3C', '1', 21, '2024-08-04 05:06:38');
+(31, 'honey lee.limot@bnhs.gov.ph', '$2y$10$BAHxn6Z0k7rG9NGid.ohj.jlpCwR3vu7gqwhypPVshSXeDURjcR3C', '1', 21, '2024-08-04 05:06:38'),
+(34, 'herbert.limot@bnhs.gov.ph', '$2y$10$t.fBUlRoQU8W9hIGt0fHLOg9U3JznS2EtEGU0l7OXwPR04EacDkQe', '1', 24, '2024-10-20 06:10:58');
 
 --
 -- Indexes for dumped tables
@@ -490,13 +492,13 @@ ALTER TABLE `subject`
 -- AUTO_INCREMENT for table `teacher`
 --
 ALTER TABLE `teacher`
-  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- Constraints for dumped tables
