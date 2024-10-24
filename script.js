@@ -746,6 +746,10 @@ $(document).ready(function() {
 
    
     var table = $('#student').DataTable({
+        dom: 'lBfrtip',  
+        buttons: [
+            'copy', 'excel' 
+        ],
         serverSide: true,
         lengthChange: true,
         responsive: true,
@@ -1453,9 +1457,9 @@ $('#classSched').on('click', 'button.view', function(){
 
 
 $('#attendance').DataTable({
-    dom: 'Bfrtip', 
+    dom: 'lBfrtip',  
     buttons: [
-     
+        'copy', 'excel' 
     ],
     serverSide: true,
     lengthChange: true,
