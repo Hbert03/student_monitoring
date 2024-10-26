@@ -366,16 +366,41 @@ if (isset($_POST['getdatastudent'])) {
 }
 
 
-if (isset($_POST['deletestudent'])) { 
+// PHP
+if (isset($_POST['deletestudent'])) {
     $student_id = $_POST['student_id'];
-    $query = "DELETE FROM student WHERE student_id = '$student_id'";
-    if (mysqli_query($conn, $query)) {
-        echo "Your data has been deleted."; 
+
+    mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 0");
+
+    $stmt1 = $conn->prepare("DELETE FROM student_section WHERE student_id = ?");
+    $stmt1->bind_param("s", $student_id);
+    $stmt1->execute();
+
+    $stmt2 = $conn->prepare("
+        DELETE s
+        FROM student s
+        INNER JOIN parent t ON s.parent_id = t.parent_id
+        WHERE s.student_id = ?");
+    $stmt2->bind_param("s", $student_id);
+    $stmt2->execute();
+
+
+    mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 1");
+
+    if ($stmt1->affected_rows > 0 || $stmt2->affected_rows > 0) {
+        echo "Your data has been deleted.";
     } else {
-        echo "Failed to delete data."; 
+        echo "Failed to delete data.";
     }
+
+
+    $stmt1->close();
+    $stmt2->close();
+    $conn->close();
     exit();
 }
+
+
 
 
 if (isset($_POST['updatestudent'])) {
@@ -686,4 +711,83 @@ if (isset($_POST['attendance'])) {
 }
 
 
+
+
+if (isset($_POST['classSec'])) {
+
+    function getDataTable($draw, $start, $length, $search) {
+        global $conn;
+
+        $sortableColumns = array('fullname', 'section_name', 'school_year_name');
+        
+        $orderBy = $sortableColumns[0];
+        $orderDir = 'ASC';
+
+        if (isset($_POST['order'][0]['column']) && isset($_POST['order'][0]['dir'])) {
+            $columnIdx = intval($_POST['order'][0]['column']);
+            $orderDir = $_POST['order'][0]['dir'];
+
+            if (isset($sortableColumns[$columnIdx])) {
+                $orderBy = $sortableColumns[$columnIdx];
+            }
+        }
+
+        $query1 = "SELECT sec.section_name , sc.school_year_name,
+                          CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname
+                   FROM student st
+                   INNER JOIN student_section se ON st.student_id = se.student_id 
+                   INNER JOIN section sec ON se.section_id = sec.section_id 
+                   INNER JOIN school_year sc ON sc.school_year_id = se.school_year_id";
+
+        if (!empty($search)) {
+            $escapedSearch = $conn->real_escape_string($search);
+            $query1 .= " AND (sec.section_name LIKE '%$escapedSearch%' OR 
+                               CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname)  LIKE '%$escapedSearch%' OR 
+                              sc.school_year_name LIKE '%$escapedSearch%')";
+        }
+
+        $query1 .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
+
+        $result1 = $conn->query($query1);
+
+        $totalQuery1 = "SELECT COUNT(*) AS total_count 
+                         FROM student st
+                   INNER JOIN student_section se ON st.student_id = se.student_id 
+                   INNER JOIN section sec ON se.section_id = sec.section_id 
+                   INNER JOIN school_year sc ON sc.school_year_id = se.school_year_id";
+
+        if (!empty($search)) {
+            $escapedSearch = $conn->real_escape_string($search);
+            $totalQuery1 .= " AND (sec.section_name LIKE '%$escapedSearch%' OR 
+                               CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname)  LIKE '%$escapedSearch%' OR 
+                              sc.school_year_name LIKE '%$escapedSearch%')";
+        }
+
+        $totalResult1 = $conn->query($totalQuery1);
+        $totalRow1 = $totalResult1->fetch_assoc();
+        $totalRecords1 = $totalRow1['total_count'];
+
+        $data = array();
+        while ($row = $result1->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => intval($draw),
+            "recordsTotal" => intval($totalRecords1),
+            "recordsFiltered" => intval($totalRecords1),
+            "data" => $data
+        );
+
+        return json_encode($output);
+    }
+
+    $draw = $_POST["draw"];
+    $start = $_POST["start"];
+    $length = $_POST["length"];
+    $search = isset($_POST["search"]["value"]) ? $_POST["search"]["value"] : '';
+
+    echo getDataTable($draw, $start, $length, $search);    
+    exit();
+}
 ?>

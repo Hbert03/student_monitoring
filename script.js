@@ -931,47 +931,49 @@ $(document).ready(function() {
 
 
 
-    function deletedstudent(){
-        $('#student').on('click', 'button.delete', function(){
-            let student_id = $(this).data('student');
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You want to delete it?",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: 'fetch_data.php',
-                                type: 'POST',
-                                data: {
-                                    deletestudent: true,
-                                    student_id: student_id
-                                },
-                                success: function(response) {
-                                    if (response.trim() === "Your data has been deleted.") {
-                                        Swal.fire(
-                                            'Deleted!',
-                                            'File has been deleted successfully.',
-                                            'success'
-                                        );
-                                        $('#student').DataTable().ajax.reload(null, false);
-                                    } else {
-                                        Swal.fire(
-                                            'Failed!',
-                                            'Failed to delete file.',
-                                            'error'
-                                        );
-                                    }
-                                },
-                            });
+function deletedstudent(){
+    $('#student').on('click', 'button.delete', function(){
+        let student_id = $(this).data('student');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to delete it?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'fetch_data.php',
+                    type: 'POST',
+                    data: {
+                        deletestudent: true,
+                        student_id: student_id
+                    },
+                    success: function(response) {
+                        if (response.trim() === "Your data has been deleted.") {
+                            Swal.fire(
+                                'Deleted!',
+                                'File has been deleted successfully.',
+                                'success'
+                            );
+                            $('#student').DataTable().ajax.reload(null, false);
+                        } else {
+                            Swal.fire(
+                                'Failed!',
+                                'Failed to delete file.',
+                                'error'
+                            );
                         }
-                    });
+                    },
                 });
-        }
+            }
+        });
+    });
+}
+
 
 
 
@@ -1500,49 +1502,75 @@ $('#attendance').DataTable({
 
 
 
-    $(document).ready(function () {
-        let qrInputTimeout = null;
-    
-        $('#qrInput').on('input', function () {
-            clearTimeout(qrInputTimeout);
-    
+$('#classSec').DataTable({
+    dom: 'lBfrtip',  
+    buttons: [
+        'copy', 'excel' 
+    ],
+    serverSide: true,
+    lengthChange: true,
+    responsive: true,
+    autoWidth: false,
+    ajax: {
+        url: "fetch_data.php",
+        type: "POST",
+        data: {classSec: true},
+        error: function(xhr, error, thrown) {
+            console.log("Ajax Failed: " + thrown);
+        }
+    },
+    columns: [
+        { 
+            "data": "section_name",
+        },
+        { "data": "school_year_name" },
+        { "data": "fullname" }
+    ],
+});
 
-            qrInputTimeout = setTimeout(function () {
-                var qrData = $('#qrInput').val().trim();
- 
-                var studentIdMatch = qrData.match(/Student ID:\s*(\d+)/);
-                var studentId = studentIdMatch ? studentIdMatch[1] : null;
-    
-                if (studentId) {
-                    $.ajax({
-                        url: 'insert.php',
-                        type: 'POST',
-                        data: {
-                            student_id: studentId
-                        },
-                        success: function (response) {
-                           toastr.success("Success!");
-                            
-                     
-                        },
-                        error: function () {
-                            toastr.error("QRcode Invalid");
-                            
-                      
-                          
+
+
+$(document).ready(function () {
+    let qrInputTimeout = null;
+
+    $('#qrInput').on('input', function () {
+        clearTimeout(qrInputTimeout);
+
+        qrInputTimeout = setTimeout(function () {
+            var qrData = $('#qrInput').val().trim();
+            var studentIdMatch = qrData.match(/Student ID:\s*(\d+)/);
+            var studentId = studentIdMatch ? studentIdMatch[1] : null;
+
+            if (studentId) {
+                $.ajax({
+                    url: 'insert.php',
+                    type: 'POST',
+                    data: {
+                        student_id: studentId
+                    },
+                    success: function (response) {
+                        // Parse JSON response from PHP
+                        var jsonResponse = JSON.parse(response);
+
+                        if (jsonResponse.status === 'error') {
+                            toastr.error(jsonResponse.message);
+                        } else {
+                            toastr.success("Success!");
                         }
-                    });
-                } else {
-                   toastr.error("Contact Your Administrator");
-                    
-                   
-               
-                }
-    
-                $('#qrInput').val('');
-            }, 500);
-        });
+                    },
+                    error: function () {
+                        toastr.error("QR code Invalid");
+                    }
+                });
+            } else {
+                toastr.error("Contact Your Administrator");
+            }
+
+            $('#qrInput').val('');
+        }, 500);
     });
+});
+
     
 
 

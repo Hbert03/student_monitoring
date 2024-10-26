@@ -17,6 +17,19 @@ $attendance_windows = [
     'afternoon_in' => ['13:00:00', '14:00:00'],
     'afternoon_out' => ['16:00:00', '18:00:00'],
 ];
+//check student
+$sql_check_student = "SELECT student_id FROM student WHERE student_id = ?";
+$stmt_check = $conn->prepare($sql_check_student);
+$stmt_check->bind_param("i", $student_id);
+$stmt_check->execute();
+$result_check = $stmt_check->get_result();
+$student_exists = $result_check->num_rows > 0;
+$stmt_check->close();
+
+if (!$student_exists) {
+    echo json_encode(['status' => 'error', 'message' => 'Student not found.']);
+    exit;
+}
 
 // Determine attendance status
 if ($current_time >= $attendance_windows['morning_in'][0] && $current_time <= $attendance_windows['morning_in'][1]) {

@@ -67,7 +67,44 @@ include ('header.php');
   </div>
   </div>
 </section>
+<div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Class Section</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+          </ol>
+        </div><!-- /.col -->
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+
+  <!-- Main content -->
+  <section class="content">
+  <div class="card">
+    <div class="card-body">
+    <div class="table-responsive">
+                  <table id="classSec" class="table table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th>Section Name</th>
+                        <th>School Year</th>
+                        <th>Student</th>
+                      </tr>
+                    </thead>
+                <tbody></tbody>
+             </table>
+        </div>
+  </div>
+  </div>
+</section>
+
 </div>
+
+
 <!-- /.content-wrapper -->
 
 
