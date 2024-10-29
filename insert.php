@@ -33,17 +33,17 @@ if (!$student_exists) {
 }
 
 // Determine attendance status
-if ($current_time >= $attendance_windows['morning_in'][0] && $current_time <= $attendance_windows['morning_in'][1]) {
+if ($current_date >= $attendance_windows['morning_in'][0] && $current_date <= $attendance_windows['morning_in'][1]) {
     $status = 'IN';
-} elseif ($current_time > $attendance_windows['morning_in'][1] && $current_time < $attendance_windows['morning_out'][0]) {
+} elseif ($current_date > $attendance_windows['morning_in'][1] && $current_date < $attendance_windows['morning_out'][0]) {
     $status = 'LATE'; 
-} elseif ($current_time >= $attendance_windows['morning_out'][0] && $current_time <= $attendance_windows['morning_out'][1]) {
+} elseif ($current_date >= $attendance_windows['morning_out'][0] && $current_date <= $attendance_windows['morning_out'][1]) {
     $status = 'OUT'; 
-} elseif ($current_time >= $attendance_windows['afternoon_in'][0] && $current_time <= $attendance_windows['afternoon_in'][1]) {
+} elseif ($current_date >= $attendance_windows['afternoon_in'][0] && $current_date <= $attendance_windows['afternoon_in'][1]) {
     $status = 'IN'; 
-} elseif ($current_time > $attendance_windows['afternoon_in'][1] && $current_time < $attendance_windows['afternoon_out'][0]) {
+} elseif ($current_date > $attendance_windows['afternoon_in'][1] && $current_date < $attendance_windows['afternoon_out'][0]) {
     $status = 'LATE'; 
-} elseif ($current_time >= $attendance_windows['afternoon_out'][0] && $current_time <= $attendance_windows['afternoon_out'][1]) {
+} elseif ($current_date >= $attendance_windows['afternoon_out'][0] && $current_date <= $attendance_windows['afternoon_out'][1]) {
     $status = 'OUT'; 
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Invalid attendance time.']);
