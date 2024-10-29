@@ -1555,7 +1555,7 @@ $(document).ready(function () {
                         if (jsonResponse.status === 'error') {
                             toastr.error(jsonResponse.message);
                         } else {
-                            toastr.success("Success!");
+                            toastr.success("SCAN Success!");
                         }
                     },
                     error: function () {

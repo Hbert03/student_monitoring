@@ -5,7 +5,7 @@ require 'vendor/autoload.php';
 $apiKey = 'f770208e20af697387421fcf32ba90da';
 $student_id = intval($_POST['student_id']);
 
-date_default_timezone_set('Asia/Manila');
+// date_default_timezone_set('Asia/Manila');
 $current_time = date('H:i:s');
 $current_date = date('Y-m-d H:i:s');
 $status = '';
@@ -113,9 +113,9 @@ if ($parent) {
     }
 
     // Insert attendance record
-    $sql = "INSERT INTO attendance (date, student_id, status) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO attendance (student_id, status) VALUES (?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sis", $current_date, $student_id, $status);
+    $stmt->bind_param("is", $student_id, $status);
     if ($stmt->execute()) {
         echo json_encode(['status' => 'success', 'message' => 'Scan Successfully.']);
     } else {
