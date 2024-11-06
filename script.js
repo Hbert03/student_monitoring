@@ -23,7 +23,7 @@ $(document).ready(function() {
 
       var requiredFilled = true;
       $("#addStudentForm input, #addStudentForm select").each(function() {
-          if ($(this).prop("required") && $(this).val() === "") {
+          if ($(this).prop("required")) {
               requiredFilled = false;
               $(this).addClass("is-invalid");
           } else {
@@ -300,7 +300,7 @@ $("button.add_subject").on("click", function() {
   
         var requiredFilled = true;
         $("#addteacherForm input, #addteacherForm select").each(function() {
-            if ($(this).prop("required") && $(this).val() === "") {
+            if ($(this).prop("required")) {
                 requiredFilled = false;
                 $(this).addClass("is-invalid");
             } else {
@@ -526,7 +526,7 @@ $(document).ready(function() {
       
             var requiredFilled = true;
             $("#addSectionForm input, #addSectionForm select").each(function() {
-                if ($(this).prop("required") && $(this).val() === "") {
+                if ($(this).prop("required")) {
                     requiredFilled = false;
                     $(this).addClass("is-invalid");
                 } else {
@@ -577,7 +577,7 @@ $(document).ready(function() {
       
             var requiredFilled = true;
             $("#addclassScheduleForm select").each(function() {
-                if ($(this).prop("required") && $(this).val() === "") {
+                if ($(this).prop("required")) {
                     requiredFilled = false;
                     $(this).addClass("is-invalid");
                 } else {
@@ -660,7 +660,7 @@ $(document).ready(function() {
 
         var requiredFilled = true;
         $("#addstudentSectionForm select").each(function() {
-            if ($(this).prop("required") && $(this).val() === "") {
+            if ($(this).prop("required")) {
                 requiredFilled = false;
                 $(this).addClass("is-invalid");
             } else {

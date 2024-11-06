@@ -38,7 +38,7 @@ include ('header.php');
           </div>
           <div class="form-group col-md-6">
             <label for="gradelevel">Grade Level</label>
-            <select class="form-control grade_level1" name="gradelevel"></select>
+            <select class="form-control grade_level1" name="gradelevel" required></select>
           </div>
         </div>
         <div class="text-center">
@@ -69,21 +69,21 @@ include ('header.php');
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="fullname">Subject</label>
-            <select class="form-control subject" name="subject"></select>
+            <select class="form-control subject" name="subject" required></select>
           </div>
           <div class="form-group col-md-6">
             <label for="address">Teacher</label>
-            <select class="form-control teacher" name="teacher"></select>
+            <select class="form-control teacher" name="teacher" required></select>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="fullname">Section</label>
-            <select class="form-control section" name="section"></select>
+            <select class="form-control section" name="section" required></select>
           </div>
           <div class="form-group col-md-6">
             <label for="address">School Year</label>
-            <select class="form-control school_year" name="school_year"></select>
+            <select class="form-control school_year" name="school_year" required></select>
           </div>
         </div>
         <div class="text-center">
@@ -112,15 +112,15 @@ include ('header.php');
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         <label for="fullname">Section</label>
-                        <select class="form-control section" name="section"></select>
+                        <select class="form-control section" name="section" required></select>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="address">School year</label>
-                        <select class="form-control school_year" name="school_year"></select>
+                        <select class="form-control school_year" name="school_year" required></select>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="address">Student</label>
-                        <select class="form-control student" name="student[]" multiple="multiple"></select>
+                        <select class="form-control student" name="student[]" multiple="multiple" required></select>
                     </div>
                     </div>
                 <div class="text-center">

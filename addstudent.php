@@ -34,11 +34,11 @@ include ('header.php');
           <div class="card-body">
             <div class="form-row">
               <div class="form-group col-md-6">
-                <label for="parentname">Parent/Guardian Name</label>
+                <label for="parentname">Parent/Guardian Name <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="parentname" name="parentname" placeholder="Fullname" required>
               </div>
               <div class="form-group col-md-6">
-                <label for="mobilenumber">Mobile Number</label>
+                <label for="mobilenumber">Mobile Number <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" placeholder="Mobile Number" required>
               </div>
             
@@ -49,7 +49,7 @@ include ('header.php');
                 <input type="email" class="form-control" id="email" name="email" placeholder="Email">
               </div>
               <div class="form-group col-md-6">
-                <label for="address">Address</label>
+                <label for="address">Address <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
               </div>
             </div>
@@ -63,17 +63,17 @@ include ('header.php');
           <div class="card-body">
             <div class="form-row">
               <div class="form-group col-md-6">
-                <label for="firstname">Student Firstname</label>
+                <label for="firstname">Student Firstname <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname" required>
               </div>
               <div class="form-group col-md-6">
-                <label for="middlename">Student Middlename</label>
+                <label for="middlename">Student Middlename <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="middlename" name="middlename" placeholder="Middlename" required>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
-                <label for="lastname">Student Lastname</label>
+                <label for="lastname">Student Lastname <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Lastname" required>
               </div>
               <div class="form-group col-md-6">
@@ -83,12 +83,12 @@ include ('header.php');
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
-                <label for="studentaddress">Student Address</label>
+                <label for="studentaddress">Student Address <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="studentaddress" name="studentaddress" placeholder="Address" required>
               </div>
               <div class="form-group col-md-6">
-                <label for="status">Status</label>
-                <select class="form-control" id="status" name="status" required>
+                <label for="status">Status <span style="color:red">*</span></label>
+                <select class="form-control " id="status" name="status" required>
                   <option value="" disabled selected>Select status</option>
                   <option value="single">Single</option>
                   <option value="married">Married</option>

@@ -29,31 +29,31 @@ include ('header.php');
       <form id="addteacherForm">
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="firstname">Firstname</label>
+            <label for="firstname">Firstname <span style="color:red">*</span></label>
             <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname" required>
           </div>
           <div class="form-group col-md-6">
-            <label for="middlename">Middlename</label>
+            <label for="middlename">Middlename <span style="color:red">*</span></label>
             <input type="text" class="form-control" id="middlename" name="middlename" placeholder="Middlename" required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="lastname">Lastname</label>
+            <label for="lastname">Lastname <span style="color:red">*</span></label>
             <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Lastname" required>
           </div>
           <div class="form-group col-md-6">
-            <label for="address">Address</label>
+            <label for="address">Address <span style="color:red">*</span></label>
             <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="mobile_num">Mobile Number</label>
+            <label for="mobile_num">Mobile Number <span style="color:red">*</span></label>
             <input type="text" class="form-control" id="mobile_num" name="mobile_num" placeholder="Mobile Number" required>
           </div>
           <div class="form-group col-md-6">
-          <label for="status">Status</label>
+          <label for="status">Status <span style="color:red">*</span></label>
              <select class="form-control" id="status" name="status" required>
                   <option value="" disabled selected>Select status</option>
                   <option value="single">Single</option>
