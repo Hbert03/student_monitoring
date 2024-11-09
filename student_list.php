@@ -62,9 +62,8 @@ if (!isset($_SESSION['user_id'])) {
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link active">Home</a>
+        <a href="#" class="nav-link">Home</a>
       </li>
-    
     </ul>
   <!-- Right navbar links -->
   <ul class="navbar-nav ml-auto">
@@ -103,20 +102,19 @@ if (!isset($_SESSION['user_id'])) {
     <nav class="mt-2" id="sidebarNav">
   <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
     <li class="nav-item ">
-      <a href="#" class="nav-link active">
+      <a href="t_index.php" class="nav-link">
         <i class="nav-icon fas fa-tachometer-alt"></i>
         <p>Attendance</p>
       </a>
     </li>
     <li class="nav-item ">
-      <a href="student_list.php" class="nav-link ">
+      <a href="#" class="nav-link active">
         <i class="nav-icon fas fa-book"></i>
         <p>My Subject</p>
       </a>
     </li>
   </ul>
 </nav>
-
 
     <!-- /.sidebar-menu -->
   </div>
@@ -148,13 +146,13 @@ if (!isset($_SESSION['user_id'])) {
   <section class="content">
   <div class="card">
     <div class="card-body">
+    <select class="form-control w-25 sort_subject"></select>
     <div class="table-responsive">
-                  <table id="attendance" class="table table-bordered table-striped">
+                  <table id="mysubject" class="table table-bordered table-striped">
                     <thead>
                       <tr>
-                        <th>Date</th>
-                        <th>Student</th>
-                        <th colspan="2">Status</th>
+                        <th>Name</th>
+                        <th>Grade Level</th>
                       </tr>
                     </thead>
                 <tbody></tbody>

@@ -57,13 +57,46 @@ session_start();
         <div class="row">
           <div class="col align-self-center">
             <button type="submit" class="btn btn-primary btn-block signin">Sign In</button>
-            <a href="register.php">Create Account</a>
+            <a href="#" data-toggle="modal" data-target="#forgotPasswordModal">Forgot Password?</a>
           </div>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="forgotPasswordModalLabel">Reset Password</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="forgot_password_function.php" method="post">
+        <div class="modal-body">
+          <p>Please enter your registered email address to receive a verification code.</p>
+          <div class="input-group mb-3">
+            <input type="email" class="form-control" placeholder="Enter your email" name="email" required>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Send Verification Code</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
 <!-- /.login-box -->
 
 <!-- jQuery -->

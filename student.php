@@ -34,6 +34,7 @@ include ('header.php');
                         <th>Name</th>
                         <th>Mobile Number</th>
                         <th>Address</th>
+                        <th>Grade Level</th>
                         <th>QR CODE</th>
                         <th colspan="2">Action</th>
                       </tr>

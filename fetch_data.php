@@ -22,8 +22,8 @@ if (isset($_POST['fetch'])) {
             }
         }
 
-        $query1 = "SELECT *, CONCAT(student_firstname, ' ', COALESCE(SUBSTRING(student_middlename, 1, 1), ''), '. ', student_lastname) AS fullname 
-                   FROM student 
+        $query1 = "SELECT s.*, CONCAT(s.student_firstname, ' ', COALESCE(SUBSTRING(s.student_middlename, 1, 1), ''), '. ', s.student_lastname) AS fullname , g.grade_level_name
+                   FROM student s INNER JOIN grade_level g ON g.grade_level = s.grade_level_id
                    WHERE 1=1";
 
         if (!empty($search)) {
@@ -790,4 +790,111 @@ if (isset($_POST['classSec'])) {
     echo getDataTable($draw, $start, $length, $search);    
     exit();
 }
+
+if (isset($_POST['mysubject'])) {
+
+    function getsubjectList($draw, $start, $length, $search, $teacher_id, $subject_id) {
+        global $conn;
+
+        $sortableColumns = array('fullname', 'date', 'in_out_status'); 
+        
+        $orderBy = $sortableColumns[0];
+        $orderDir = 'ASC';
+
+        if (isset($_POST['order'][0]['column']) && isset($_POST['order'][0]['dir'])) {
+            $columnIdx = intval($_POST['order'][0]['column']);
+            $orderDir = $_POST['order'][0]['dir'];
+
+            if (isset($sortableColumns[$columnIdx])) {
+                $orderBy = $sortableColumns[$columnIdx];
+            }
+        }
+
+        // Prepare query with teacher and subject filters
+        $query1 = "SELECT gr.grade_level_name, st.*, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname 
+                   FROM student st 
+                   INNER JOIN student_section sts ON st.student_id = sts.student_id
+                   INNER JOIN section se ON sts.section_id = se.section_id 
+                   INNER JOIN class_schedule cs ON se.section_id = cs.section_id 
+                   INNER JOIN grade_level gr ON gr.grade_level = se.section_id 
+                   INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+                   WHERE te.teacher_id = ?";
+
+        // Add subject filter if subject_id is provided
+        if (!is_null($subject_id)) {
+            $query1 .= " AND cs.subject_id = ?";
+        }
+
+        // Add search filter
+        if (!empty($search)) {
+            $escapedSearch = $conn->real_escape_string($search);
+            $query1 .= " AND (st.student_firstname LIKE '%$escapedSearch%')";
+        }
+
+        $query1 .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
+
+        $stmt = $conn->prepare($query1);
+        
+        // Bind teacher_id and subject_id (if provided)
+        if (is_null($subject_id)) {
+            $stmt->bind_param('i', $teacher_id);
+        } else {
+            $stmt->bind_param('ii', $teacher_id, $subject_id);
+        }
+        
+        $stmt->execute();
+        $result1 = $stmt->get_result();
+
+        // Count query for total records
+        $totalQuery1 = "SELECT COUNT(*) AS total_count 
+                        FROM student st 
+                        INNER JOIN student_section sts ON st.student_id = sts.student_id 
+                        INNER JOIN section se ON sts.section_id = se.section_id 
+                        INNER JOIN class_schedule cs ON se.section_id = cs.section_id 
+                        INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+                        WHERE te.teacher_id = ?";
+        
+        if (!is_null($subject_id)) {
+            $totalQuery1 .= " AND cs.subject_id = ?";
+        }
+
+        $stmtTotal = $conn->prepare($totalQuery1);
+        
+        if (is_null($subject_id)) {
+            $stmtTotal->bind_param('i', $teacher_id);
+        } else {
+            $stmtTotal->bind_param('ii', $teacher_id, $subject_id);
+        }
+
+        $stmtTotal->execute();
+        $totalResult1 = $stmtTotal->get_result();
+        $totalRow1 = $totalResult1->fetch_assoc();
+        $totalRecords1 = $totalRow1['total_count'];
+
+        $data = array();
+        while ($row = $result1->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => intval($draw),
+            "recordsTotal" => intval($totalRecords1),
+            "recordsFiltered" => intval($totalRecords1),
+            "data" => $data
+        );
+
+        return json_encode($output);
+    }
+
+    $draw = $_POST["draw"];
+    $start = $_POST["start"];
+    $length = $_POST["length"];
+    $search = isset($_POST["search"]["value"]) ? $_POST["search"]["value"] : '';
+    $teacher_id = $_SESSION["teacher_id"];
+    $subject_id = isset($_POST['subject']) ? $_POST['subject'] : null;
+
+    echo getsubjectList($draw, $start, $length, $search, $teacher_id, $subject_id);
+    exit();
+}
+
 ?>

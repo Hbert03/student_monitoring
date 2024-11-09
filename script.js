@@ -23,7 +23,7 @@ $(document).ready(function() {
 
       var requiredFilled = true;
       $("#addStudentForm input, #addStudentForm select").each(function() {
-          if ($(this).prop("required")) {
+        if ($(this).prop("required") && !$(this).val()) {
               requiredFilled = false;
               $(this).addClass("is-invalid");
           } else {
@@ -300,7 +300,7 @@ $("button.add_subject").on("click", function() {
   
         var requiredFilled = true;
         $("#addteacherForm input, #addteacherForm select").each(function() {
-            if ($(this).prop("required")) {
+            if ($(this).prop("required") && !$(this).val()) {
                 requiredFilled = false;
                 $(this).addClass("is-invalid");
             } else {
@@ -526,7 +526,7 @@ $(document).ready(function() {
       
             var requiredFilled = true;
             $("#addSectionForm input, #addSectionForm select").each(function() {
-                if ($(this).prop("required")) {
+                if ($(this).prop("required") && !$(this).val()) {
                     requiredFilled = false;
                     $(this).addClass("is-invalid");
                 } else {
@@ -577,7 +577,7 @@ $(document).ready(function() {
       
             var requiredFilled = true;
             $("#addclassScheduleForm select").each(function() {
-                if ($(this).prop("required")) {
+                if ($(this).prop("required") && !$(this).val()) {
                     requiredFilled = false;
                     $(this).addClass("is-invalid");
                 } else {
@@ -660,7 +660,7 @@ $(document).ready(function() {
 
         var requiredFilled = true;
         $("#addstudentSectionForm select").each(function() {
-            if ($(this).prop("required")) {
+            if ($(this).prop("required") && !$(this).val()) {
                 requiredFilled = false;
                 $(this).addClass("is-invalid");
             } else {
@@ -769,6 +769,7 @@ $(document).ready(function() {
             { "data": "fullname" },
             { "data": "student_mobile" },
             { "data": "student_address" },
+            { "data": "grade_level_name" },
             { 
                 "data": "qrcode",
                 "orderable": false,
@@ -1637,3 +1638,78 @@ $(document).ready(function () {
         }
     });
     
+
+
+    
+$(document).ready(function() {
+    function initializeSelect2() {
+        $('select.sort_subject').select2({
+            theme: "bootstrap4",
+            placeholder: 'Sort By Subject',
+            ajax: {
+                url: 'select_fetch.php',
+                type: 'POST',
+                dataType: "json",
+                delay: 250,
+                data: function(params) {
+                    return {
+                        subject: true,
+                        term: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: $.map(data.results, function(grade) {
+                            return {
+                                id: grade.subject_id,
+                                text: grade.subject_name
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0,
+            allowClear: true
+        });
+        $(".select2-container").css("margin-bottom", "1em");
+    }
+
+
+    initializeSelect2();
+
+   
+    var table = $('#mysubject').DataTable({
+        dom: 'lBfrtip',  
+        buttons: [
+            'copy', 'excel' 
+        ],
+        serverSide: true,
+        lengthChange: true,
+        responsive: true,
+        autoWidth: false,
+        ajax: {
+            url: "fetch_data.php",
+            type: "POST",
+            data: function(d) {
+                d.mysubject = true;
+                d.subject = $('select.sort_subject').val(); 
+            },
+            error: function(xhr, error, thrown) {
+                console.log("Ajax Failed: " + thrown);
+            }
+        },
+        columns: [
+            { "data": "fullname" },
+            { "data": "student_mobile" },
+        ],
+        drawCallback: function(){
+            deletedstudent();
+            editstudent();
+        }
+    });
+    
+    $('select.sort_subject').on('change', function() {
+        table.draw(); 
+    });
+});
