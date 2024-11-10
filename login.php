@@ -65,7 +65,6 @@ session_start();
   </div>
 </div>
 
-<!-- Forgot Password Modal -->
 <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -77,12 +76,12 @@ session_start();
       </div>
       <form action="forgot_password_function.php" method="post">
         <div class="modal-body">
-          <p>Please enter your registered email address to receive a verification code.</p>
+          <p>Please enter your registered phone number to receive a verification code via SMS.</p>
           <div class="input-group mb-3">
-            <input type="email" class="form-control" placeholder="Enter your email" name="email" required>
+            <input type="text" class="form-control" placeholder="Enter your phone number" name="phone_number" required>
             <div class="input-group-append">
               <div class="input-group-text">
-                <span class="fas fa-envelope"></span>
+                <span class="fas fa-phone"></span>
               </div>
             </div>
           </div>
