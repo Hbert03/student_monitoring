@@ -1701,7 +1701,7 @@ $(document).ready(function() {
         },
         columns: [
             { "data": "fullname" },
-            { "data": "student_mobile" },
+            { "data": "grade_level_name" },
         ],
         drawCallback: function(){
             deletedstudent();
