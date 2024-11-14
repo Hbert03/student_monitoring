@@ -1591,10 +1591,11 @@ $(document).ready(function () {
         const systemTime = new Intl.DateTimeFormat('en-US', options).format(new Date());
         document.getElementById("dateTime").innerText = systemTime;
     }
-
-    setInterval(showTime, 1000); 
-
-    window.onload = showTime;
+    window.onload = function() {
+        showTime();
+        setInterval(showTime, 1000);
+    };
+    
 
 
 

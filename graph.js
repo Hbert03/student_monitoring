@@ -1,73 +1,54 @@
 
-function fetchData() {
-
+function fetchEnrolledData() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'graph_function.php', true); 
+    xhr.open('GET', 'graph_function.php?type=enrolled', true);
     xhr.onload = function() {
         if (xhr.status >= 200 && xhr.status < 300) {
-            
             var data = JSON.parse(xhr.responseText);
-            updateChart(data); 
-        } else {
-     
+            updateEnrolledChart(data);
         }
     };
     xhr.onerror = function() {
-     
+        console.error('Request failed for enrolled data.');
     };
     xhr.send();
 }
 
+function fetchAbsentData() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'graph_function.php?type=absent', true);
+    xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            var data = JSON.parse(xhr.responseText);
+            updateAbsentChart(data);
+        }
+    };
+    xhr.onerror = function() {
+        console.error('Request failed for absent data.');
+    };
+    xhr.send();
+}
 
-function updateChart(data) {
+function updateEnrolledChart(data) {
     var labels = data.labels;
     var values = data.values;
 
+    var ctx = document.getElementById('enrolledChart').getContext('2d');
 
-    var ctx = document.getElementById('graphchart').getContext('2d');
-
-    if(window.graphchart instanceof Chart) {
-
-        window.graphchart.data.labels = labels;
-        window.graphchart.data.datasets[0].data = values;
-        window.graphchart.update();
+    if(window.enrolledChart instanceof Chart) {
+        window.enrolledChart.data.labels = labels;
+        window.enrolledChart.data.datasets[0].data = values;
+        window.enrolledChart.update();
     } else {
-        window.graphchart = new Chart(ctx, {
+        window.enrolledChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'NUMBER OF ENROLLED STUDENT',
+                    label: 'NUMBER OF ENROLLED STUDENTS',
                     data: values,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)',
-                        'rgba(199, 199, 199, 0.2)',
-                        'rgba(83, 102, 255, 0.2)',
-                        'rgba(255, 102, 102, 0.2)',
-                        'rgba(102, 255, 178, 0.2)',
-                        'rgba(178, 102, 255, 0.2)',
-                        'rgba(255, 204, 102, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)',
-                        'rgba(199, 199, 199, 1)',
-                        'rgba(83, 102, 255, 1)',
-                        'rgba(255, 102, 102, 1)',
-                        'rgba(102, 255, 178, 1)',
-                        'rgba(178, 102, 255, 1)',
-                        'rgba(255, 204, 102, 1)'
-                    ],
-                    
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }]
             },
@@ -78,15 +59,52 @@ function updateChart(data) {
                             beginAtZero: true
                         }
                     }]
-                },
-               
-                
+                }
             }
-            
         });
     }
 }
 
-fetchData();
+function updateAbsentChart(data) {
+    var labels = data.labels;
+    var values = data.values;
 
-setInterval(fetchData, 10000);
+    var ctx = document.getElementById('absentChart').getContext('2d');
+
+    if(window.absentChart instanceof Chart) {
+        window.absentChart.data.labels = labels;
+        window.absentChart.data.datasets[0].data = values;
+        window.absentChart.update();
+    } else {
+        window.absentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'NUMBER OF ABSENT STUDENTS TODAY',
+                    data: values,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+}
+
+// Initial data fetch
+fetchEnrolledData();
+fetchAbsentData();
+
+// Set intervals to update data every 10 seconds (optional)
+setInterval(fetchEnrolledData, 10000);
+setInterval(fetchAbsentData, 10000);

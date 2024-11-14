@@ -96,6 +96,42 @@ $totalSenior = $senior->getValue("totalSenior");
           <!-- ./col -->
         </div>
         <!-- /.row -->
+           <!-- Main row -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title">Absent Student Data</h5>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+              
+                  <div class="col-md-12">
+                     <p class="text-center">
+                      <strong></strong>
+                         </p>
+
+                       <div class="chart" style="width:100%;">
+                       <!-- Sales Chart Canvas -->
+                         <canvas id="absentChart" height="70"></canvas>
+                        </div>
+                      </div>
+     
+                    </div>
+ 
+                 </div>
+          
+                <!-- /.row -->
         <!-- Main row -->
         <div class="row">
           <div class="col-md-12">
@@ -123,7 +159,7 @@ $totalSenior = $senior->getValue("totalSenior");
 
                        <div class="chart" style="width:100%;">
                        <!-- Sales Chart Canvas -->
-                         <canvas id="graphchart" height="70"></canvas>
+                         <canvas id="enrolledChart" height="70"></canvas>
                         </div>
                       </div>
      
