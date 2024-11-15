@@ -1142,9 +1142,76 @@ function deletedteacher(){
     };
 
 
+    $(document).ready(function() {
+        function initializeSubjectSelect2() {
+            $('select.filterSubject').select2({
+                theme: "bootstrap4",
+                placeholder: 'Filter By Subject',
+                ajax: {
+                    url: 'select_fetch.php',
+                    type: 'POST',
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            subject: true,
+                            term: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data.results, function(subject) {
+                                return {
+                                    id: subject.subject_id,
+                                    text: subject.subject_name
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0,
+                allowClear: true
+            });
+        }
+    
 
-
-    $(document).ready(function(){
+        function initializeSchoolYearSelect2() {
+            $('select.filterSchoolYear').select2({
+                theme: "bootstrap4",
+                placeholder: 'Filter by School Year',
+                ajax: {
+                    url: 'select_fetch.php',
+                    type: 'POST',
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            school_year: true,
+                            term: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data.results, function(year) {
+                                return {
+                                    id: year.school_year_id,
+                                    text: year.school_year_name
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0,
+                allowClear: true
+            });
+        }
+    
+    
+        initializeSubjectSelect2();
+        initializeSchoolYearSelect2();
+    
         $('#classSched').DataTable({
             serverSide: true,
             lengthChange: true,
@@ -1153,8 +1220,12 @@ function deletedteacher(){
             ajax: {
                 url: "fetch_data.php",
                 type: "POST",
-                data: {fetch_classSched: true},
-                error: function(xhr, error, thrown) {
+                data: function (d) {
+                    d.fetch_classSched = true;
+                    d.school_year = $('#filterSchoolYear').val(); 
+                    d.subject = $('#filterSubject').val(); 
+                },
+                error: function (xhr, error, thrown) {
                     console.log("Ajax Failed: " + thrown);
                 }
             },
@@ -1162,31 +1233,39 @@ function deletedteacher(){
                 { "data": "subject_name" },
                 { "data": "fullname" },
                 { "data": "section_name" },
-                { 
-                    "data": "school_year_name"
-                },
-                {"data": null,
-                    "render": function(data, type, row){
-                        return "<button class='btn btn-success btn-sm view' data-classched='"+row.teacher_id+"'>View<span><i style='margin-left:2px'class='fas fa-eye'></i></span></button>";
+                { "data": "school_year_name" },
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return "<button class='btn btn-success btn-sm view' data-classched='" + row.teacher_id + "'>View<span><i style='margin-left:2px' class='fas fa-eye'></i></span></button>";
                     }
                 },
-                {"data": null,
-                    "render": function(data, type, row){
-                        return "<button class='btn btn-info btn-sm edit' data-classched='"+row.class_schedule_id+"'>Edit<span><i style='margin-left:2px' class='fas fa-pen'></i></span></button>";
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return "<button class='btn btn-info btn-sm edit' data-classched='" + row.class_schedule_id + "'>Edit<span><i style='margin-left:2px' class='fas fa-pen'></i></span></button>";
                     }
                 },
-                {"data": null,
-                    "render": function(data, type, row){
-                        return "<button class='btn btn-danger btn-sm delete' data-classched='"+row.class_schedule_id+"'>Delete<span><i style='margin-left:2px' class='fas fa-trash'></i></span></button>";
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return "<button class='btn btn-danger btn-sm delete' data-classched='" + row.class_schedule_id + "'>Delete<span><i style='margin-left:2px' class='fas fa-trash'></i></span></button>";
                     }
                 }
             ],
-            drawCallback: function(){
+            drawCallback: function() {
                 edit();
                 deleted();
             }
         });
-    })
+    
+        // Reload DataTable when filters are changed
+        $('#filterSchoolYear, #filterSubject').on('change', function() {
+            $('#classSched').DataTable().ajax.reload();
+        });
+    });
+    
+    
 
    function deleted(){
     $('#classSched').on('click', 'button.delete', function(){

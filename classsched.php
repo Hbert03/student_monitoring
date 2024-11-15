@@ -49,7 +49,13 @@ include ('header.php');
   <!-- Main content -->
   <section class="content">
   <div class="card">
+    
     <div class="card-body">
+    <div class="col-md-6 d-flex align-items-center ">
+    <select id="filterSchoolYear" class="form-control mb-3 filterSchoolYear" style="width: 200px;"></select>
+    <select id="filterSubject" class="form-control mb-3 filterSubject" style="width: 200px;"></select>
+</div>
+
     <div class="table-responsive">
                   <table id="classSched" class="table table-bordered table-striped">
                     <thead>

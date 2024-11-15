@@ -173,7 +173,7 @@ if (isset($_POST['fetch_teacher'])) {
 
 if (isset($_POST['fetch_classSched'])) {
 
-    function getDataTable($draw, $start, $length, $search) {
+    function getDataTable($draw, $start, $length, $search, $schoolYear, $subject) {
         global $conn;
 
         $sortableColumns = array('subject_name', 'fullname', 'section_name', 'school_year_name');
@@ -190,6 +190,7 @@ if (isset($_POST['fetch_classSched'])) {
             }
         }
 
+      
         $query1 = "SELECT cs.class_schedule_id, cs.teacher_id, su.subject_name, te.teacher_firstname, te.teacher_middlename, te.teacher_lastname, 
                           CONCAT(te.teacher_firstname, ' ', COALESCE(SUBSTRING(te.teacher_middlename, 1, 1), ''), '. ', te.teacher_lastname) AS fullname, 
                           se.section_name, sc.school_year_name 
@@ -200,6 +201,7 @@ if (isset($_POST['fetch_classSched'])) {
                    INNER JOIN school_year sc ON cs.school_year_id = sc.school_year_id 
                    WHERE 1=1";
 
+
         if (!empty($search)) {
             $escapedSearch = $conn->real_escape_string($search);
             $query1 .= " AND (su.subject_name LIKE '%$escapedSearch%' OR 
@@ -208,9 +210,23 @@ if (isset($_POST['fetch_classSched'])) {
                               sc.school_year_name LIKE '%$escapedSearch%')";
         }
 
+
+        if (!empty($schoolYear)) {
+            $escapedSchoolYear = $conn->real_escape_string($schoolYear);
+            $query1 .= " AND sc.school_year_id = '$escapedSchoolYear'";
+        }
+
+       
+        if (!empty($subject)) {
+            $escapedSubject = $conn->real_escape_string($subject);
+            $query1 .= " AND su.subject_id = '$escapedSubject'";
+        }
+
+      
         $query1 .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
 
         $result1 = $conn->query($query1);
+
 
         $totalQuery1 = "SELECT COUNT(*) AS total_count 
                         FROM class_schedule cs 
@@ -220,12 +236,25 @@ if (isset($_POST['fetch_classSched'])) {
                         INNER JOIN school_year sc ON cs.school_year_id = sc.school_year_id 
                         WHERE 1=1";
 
+     
         if (!empty($search)) {
             $escapedSearch = $conn->real_escape_string($search);
             $totalQuery1 .= " AND (su.subject_name LIKE '%$escapedSearch%' OR 
                                   CONCAT(te.teacher_firstname, ' ', COALESCE(SUBSTRING(te.teacher_middlename, 1, 1), ''), '. ', te.teacher_lastname) LIKE '%$escapedSearch%' OR 
                                   se.section_name LIKE '%$escapedSearch%' OR 
                                   sc.school_year_name LIKE '%$escapedSearch%')";
+        }
+
+
+        if (!empty($schoolYear)) {
+            $escapedSchoolYear = $conn->real_escape_string($schoolYear);
+            $totalQuery1 .= " AND sc.school_year_id = '$escapedSchoolYear'";
+        }
+
+    
+        if (!empty($subject)) {
+            $escapedSubject = $conn->real_escape_string($subject);
+            $totalQuery1 .= " AND su.subject_id = '$escapedSubject'";
         }
 
         $totalResult1 = $conn->query($totalQuery1);
@@ -247,14 +276,18 @@ if (isset($_POST['fetch_classSched'])) {
         return json_encode($output);
     }
 
+
     $draw = $_POST["draw"];
     $start = $_POST["start"];
     $length = $_POST["length"];
     $search = isset($_POST["search"]["value"]) ? $_POST["search"]["value"] : '';
+    $schoolYear = isset($_POST['school_year']) ? $_POST['school_year'] : '';
+    $subject = isset($_POST['subject']) ? $_POST['subject'] : '';
 
-    echo getDataTable($draw, $start, $length, $search);    
+    echo getDataTable($draw, $start, $length, $search, $schoolYear, $subject);
     exit();
 }
+
 
 
 

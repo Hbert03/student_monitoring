@@ -49,10 +49,14 @@ function fetchAbsentData() {
     $gradeNames = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 
     foreach ($gradeLevels as $index => $gradeLevelId) {
-        $sql = "SELECT COUNT(*) as absent_total 
-                FROM student s
-                LEFT JOIN attendance a ON s.student_id = a.student_id AND a.status = 'IN'
-                WHERE a.student_id IS NULL AND s.grade_level_id = ?";
+        $sql = "SELECT COUNT(*) AS absent_total
+                    FROM student s
+                    LEFT JOIN attendance a 
+                        ON s.student_id = a.student_id 
+                        AND a.status = 'IN' 
+                        AND DATE(a.date) = CURDATE()
+                    WHERE a.student_id IS NULL 
+                    AND s.grade_level_id = ?";
         
         if ($stmt = $conn->prepare($sql)) {
             $stmt->bind_param("i", $gradeLevelId);
