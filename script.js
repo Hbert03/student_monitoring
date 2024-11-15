@@ -1175,7 +1175,7 @@ function deletedteacher(){
             });
         }
     
-
+//select filter
         function initializeSchoolYearSelect2() {
             $('select.filterSchoolYear').select2({
                 theme: "bootstrap4",
