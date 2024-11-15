@@ -12,7 +12,7 @@ $phone_number = $_SESSION['phone_number'];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $verification_code = $_POST['verification_code'];
 
-    // Retrieve the stored code and expiry from the database
+
     $query = "SELECT reset_code, code_expiry FROM users WHERE phone_number = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $phone_number);
@@ -24,18 +24,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stored_code = $user['reset_code'];
         $expiry = $user['code_expiry'];
 
-        // Check if the code matches and if it hasn't expired
+ 
         if ($verification_code == $stored_code && strtotime($expiry) > time()) {
-            // Code is valid, allow the user to reset their password
+           
             $_SESSION['verified_phone'] = $phone_number;
-            header("Location: reset_password.php"); // Redirect to reset password page
+            header("Location: reset_password.php"); 
             exit();
         } else {
-            // Invalid code or expired code
+          
             $_SESSION['error_message'] = "Invalid or expired verification code.";
         }
     } else {
-        // User not found
+
         $_SESSION['error_message'] = "Phone number not found.";
     }
 }
@@ -107,7 +107,7 @@ if(isset($_SESSION['error_message'])) {
     toastr.error("<?php echo $_SESSION['error_message']; ?>");
   </script>
   <?php
-  // Clear the error message from the session after displaying
+
   unset($_SESSION['error_message']);
 }
 ?>

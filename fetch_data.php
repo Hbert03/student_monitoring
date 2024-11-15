@@ -844,12 +844,12 @@ if (isset($_POST['mysubject'])) {
         }
 
         // Prepare query with teacher and subject filters
-        $query1 = "SELECT gr.grade_level_name, st.*, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname 
+        $query1 = "SELECT gr.grade_level_name, st.*, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname
                    FROM student st 
                    INNER JOIN student_section sts ON st.student_id = sts.student_id
                    INNER JOIN section se ON sts.section_id = se.section_id 
                    INNER JOIN class_schedule cs ON se.section_id = cs.section_id 
-                   INNER JOIN grade_level gr ON gr.grade_level = se.section_id 
+                   INNER JOIN grade_level gr ON gr.grade_level = se.grade_level_id
                    INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
                    WHERE te.teacher_id = ?";
 

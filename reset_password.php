@@ -3,7 +3,7 @@ session_start();
 require 'database.php';
 
 if (!isset($_SESSION['verified_phone'])) {
-    header("Location: login.php");
+    header("Location: reset_password.php");
     exit();
 }
 
@@ -12,17 +12,14 @@ $phone_number = $_SESSION['verified_phone'];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
 
-
     $query = "UPDATE users SET password = ? WHERE phone_number = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("ss", $new_password, $phone_number);
     if ($stmt->execute()) {
-        session_destroy(); 
-        $success_message = "Password reset successful.";
-        header("Location: login.php"); // Redirect to login page after success
+        $_SESSION['reset_message'] = "Password Updated Successfully.";
+        // Keep the user on the same page and display the message
+        header("Location: reset_password.php");
         exit();
-    } else {
-        $error_message = "Failed to reset the password. Please try again.";
     }
 }
 ?>
@@ -31,16 +28,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BNHS | Log in</title>
+  <title>BNHS | Reset Password</title>
   <link rel="icon" href="img/logo.jpg">
 
-  <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
-  <!-- icheck bootstrap -->
   <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-  <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
 </head>
@@ -69,8 +62,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 </div>
 
-
-
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
@@ -81,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="plugins/toastr/toastr.min.js"></script>
 
 <?php
-if(isset($_SESSION['login']) && $_SESSION['login'] != '') {
+if(isset($_SESSION['reset_message'])) {
   ?>
   <script>
     toastr.options = {
@@ -93,9 +84,11 @@ if(isset($_SESSION['login']) && $_SESSION['login'] != '') {
       "timeOut": "5000",
       "extendedTimeOut": "1000",
     };
-    toastr.<?php echo $_SESSION['login_code']; ?>("<?php echo $_SESSION['login']; ?>");
+    toastr.success("<?php echo $_SESSION['reset_message']; ?>");
   </script>
   <?php
-  unset($_SESSION['login']);
+  unset($_SESSION['reset_message']);
 }
 ?>
+</body>
+</html>
