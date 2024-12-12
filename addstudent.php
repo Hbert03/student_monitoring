@@ -27,34 +27,7 @@ include ('header.php');
   <div class="card">
     <div class="card-body">
       <form id="addStudentForm">
-        <div class="card mb-3">
-          <div class="card-header">
-           <h4> Parent's/Guardian Information</h4>
-          </div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="parentname">Parent/Guardian Name <span style="color:red">*</span></label>
-                <input type="text" class="form-control" id="parentname" name="parentname" placeholder="Fullname" required>
-              </div>
-              <div class="form-group col-md-6">
-                <label for="mobilenumber">Mobile Number <span style="color:red">*</span></label>
-                <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" placeholder="Mobile Number" required>
-              </div>
-            
-            </div>
-            <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="email">Email (Optional)</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
-              </div>
-              <div class="form-group col-md-6">
-                <label for="address">Address <span style="color:red">*</span></label>
-                <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
-              </div>
-            </div>
-          </div>
-        </div>
+
         
         <div class="card mb-3">
           <div class="card-header">
@@ -101,13 +74,59 @@ include ('header.php');
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="grade">Grade Level</label>
+                <select class="form-control gender" id="gender" name="gender" required>
+                </select>
+                
+              </div>
+              <div class="form-group col-md-6">
+                <label for="grade">Grade Level</label>
                 <select class="form-control gradelevel" id="grade" name="grade" required>
                 </select>
+                
+              </div>
+            </div>
+            
+          </div>
+          
+        </div>
+        <div class="card mb-3">
+          <div class="card-header">
+           <h4> Parent's/Guardian Information</h4>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="parentname">Parent/Guardian Name <span style="color:red">*</span></label>
+                <input type="text" class="form-control" id="parentname" name="parentname" placeholder="Fullname" required>
+              </div>
+              <div class="form-group col-md-6">
+                <label for="mobilenumber">Parent Type<span style="color:red">*</span></label>
+                <select  class="form-control" id="parent_type" name="parent_type" required>
+                <option value="" disabled selected>Select</option>
+                <option value="Parent">Parent</option>
+                <option value="Guardian">Guardian</option>
+                </select>
+              </div>
+            
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="mobilenumber">Mobile Number <span style="color:red">*</span></label>
+                <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" placeholder="Mobile Number" required>
+              </div>
+              <div class="form-group col-md-6">
+                <label for="email">Email (Optional)</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="address">Address <span style="color:red">*</span></label>
+                <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
               </div>
             </div>
           </div>
         </div>
-        
         <!-- Save Button -->
         <div class="text-center">
           <button type="submit" class="btn btn-primary btn1">Save</button>

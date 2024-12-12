@@ -1,52 +1,27 @@
 <?php
-class Elementary {
-    private $total1;
 
-    public function __construct() {
-        include('database.php');
 
-       $sql = "SELECT COUNT(*) as total FROM student WHERE grade_level_id IN (1, 2, 3, 4, 5, 6)";
-
-        
-        $query = $conn->query($sql);
-        $elemsData = $query->fetch_assoc();
-
-        if ($elemsData) {
-            $this->totalElems = $elemsData['total'];
-        }
-    }
-
-    public function getValue($part) {
-        switch ($part) {
-            case "totalElems":
-                return $this->totalElems;
-            default:
-                return null; 
-        }
-    }
-}
-
-class Junior_High {
+class Junior_High_Male {
 private $total2;
 
 public function __construct() {
     include('database.php');
 
-   $sql = "SELECT COUNT(*) as total FROM student WHERE grade_level_id IN (6,7,8,9,10)";
+   $sql = "SELECT COUNT(*) as total FROM student WHERE grade_level_id IN (6,7,8,9,10) and gender = 1";
 
     
     $query = $conn->query($sql);
-    $juniorData = $query->fetch_assoc();
+    $juniorDatam = $query->fetch_assoc();
 
-    if ($juniorData) {
-        $this->totalJunior = $juniorData['total'];
+    if ($juniorDatam) {
+        $this->totalJuniorm = $juniorDatam['total'];
     }
 }
 
 public function getValue($part) {
     switch ($part) {
-        case "totalJunior":
-            return $this->totalJunior;
+        case "totalJuniorm":
+            return $this->totalJuniorm;
         default:
             return null; 
     }
@@ -54,30 +29,87 @@ public function getValue($part) {
 
 }
 
-class Senior_High {
-    private $total3;
+class Junior_High_Female {
+    private $total2;
     
     public function __construct() {
         include('database.php');
     
-       $sql = "SELECT COUNT(*) as total FROM student WHERE grade_level_id IN (11, 12)";
+       $sql = "SELECT COUNT(*) as total FROM student WHERE grade_level_id IN (6,7,8,9,10) and gender = 2";
     
         
         $query = $conn->query($sql);
-        $seniorData = $query->fetch_assoc();
+        $juniorDataf = $query->fetch_assoc();
     
-        if ($seniorData) {
-            $this->totalSenior = $seniorData['total'];
+        if ($juniorDataf) {
+            $this->totalJuniorf = $juniorDataf['total'];
         }
     }
     
     public function getValue($part) {
         switch ($part) {
-            case "totalSenior":
-                return $this->totalSenior;
+            case "totalJuniorf":
+                return $this->totalJuniorf;
+            default:
+                return null; 
+        }
+    }
+    
+    }
+    
+
+class Senior_High_Male {
+    private $total4;
+    
+    public function __construct() {
+        include('database.php');
+    
+       $sql = "SELECT COUNT(*) as total FROM student WHERE grade_level_id IN (11, 12) and gender ='1'";
+    
+        
+        $query = $conn->query($sql);
+        $seniorDatam = $query->fetch_assoc();
+    
+        if ($seniorDatam) {
+            $this->totalSeniorm = $seniorDatam['total'];
+        }
+    }
+    
+    public function getValue($part) {
+        switch ($part) {
+            case "totalSeniorm":
+                return $this->totalSeniorm;
             default:
                 return null; 
         }
     }
 }    
+
+
+class Senior_High_Female {
+    private $total4;
+    
+    public function __construct() {
+        include('database.php');
+    
+       $sql = "SELECT COUNT(*) as total FROM student WHERE grade_level_id IN (11, 12) and gender ='2'";
+    
+        
+        $query = $conn->query($sql);
+        $seniorDataf = $query->fetch_assoc();
+    
+        if ($seniorDataf) {
+            $this->totalSeniorf = $seniorDataf['total'];
+        }
+    }
+    
+    public function getValue($part) {
+        switch ($part) {
+            case "totalSeniorf":
+                return $this->totalSeniorf;
+            default:
+                return null; 
+        }
+    }
+}   
 ?>

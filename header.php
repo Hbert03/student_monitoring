@@ -148,12 +148,12 @@ if (!isset($_SESSION['user_id'])) {
         <p>Teacher</p>
       </a>
     </li>
-    <li class="nav-item ">
+    <!-- <li class="nav-item ">
       <a href="classsched.php" class="nav-link">
       <i class="nav-icon fas fa-calendar-week"></i>
         <p>Class Schedule</p>
       </a>
-    </li>
+    </li> -->
   </ul>
 </nav>
 

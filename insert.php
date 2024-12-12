@@ -7,12 +7,11 @@ $student_id = intval($_POST['student_id']);
 
 // date_default_timezone_set('Asia/Manila');
 $current_time = date('H:i:s');
-$current_date = date('Y-m-d H:i:s');
 $status = '';
 
 // Define attendance windows
 $attendance_windows = [
-    'morning_in' => ['01:00:00', '08:00:00'], 
+    'morning_in' => ['07:00:00', '08:00:00'], 
     'morning_out' => ['12:00:00', '12:59:59'], 
     'afternoon_in' => ['13:00:00', '14:00:00'],
     'afternoon_out' => ['16:00:00', '18:00:00'],
@@ -33,22 +32,23 @@ if (!$student_exists) {
 }
 
 // Determine attendance status
-if ($current_date >= $attendance_windows['morning_in'][0] && $current_date <= $attendance_windows['morning_in'][1]) {
+if ($current_time >= $attendance_windows['morning_in'][0] && $current_time <= $attendance_windows['morning_in'][1]) {
     $status = 'IN';
-} elseif ($current_date > $attendance_windows['morning_in'][1] && $current_date < $attendance_windows['morning_out'][0]) {
+} elseif ($current_time > $attendance_windows['morning_in'][1] && $current_time < $attendance_windows['morning_out'][0]) {
     $status = 'LATE'; 
-} elseif ($current_date >= $attendance_windows['morning_out'][0] && $current_date <= $attendance_windows['morning_out'][1]) {
+} elseif ($current_time >= $attendance_windows['morning_out'][0] && $current_time <= $attendance_windows['morning_out'][1]) {
     $status = 'OUT'; 
-} elseif ($current_date >= $attendance_windows['afternoon_in'][0] && $current_date <= $attendance_windows['afternoon_in'][1]) {
+} elseif ($current_time >= $attendance_windows['afternoon_in'][0] && $current_time <= $attendance_windows['afternoon_in'][1]) {
     $status = 'IN'; 
-} elseif ($current_date > $attendance_windows['afternoon_in'][1] && $current_date < $attendance_windows['afternoon_out'][0]) {
+} elseif ($current_time > $attendance_windows['afternoon_in'][1] && $current_time < $attendance_windows['afternoon_out'][0]) {
     $status = 'LATE'; 
-} elseif ($current_date >= $attendance_windows['afternoon_out'][0] && $current_date <= $attendance_windows['afternoon_out'][1]) {
+} elseif ($current_time >= $attendance_windows['afternoon_out'][0] && $current_time <= $attendance_windows['afternoon_out'][1]) {
     $status = 'OUT'; 
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Invalid attendance time.']);
     exit;
 }
+
 
 // Fetch parent details
 $sql = "SELECT t.parent_mobile, t.parent_name, t.email, CONCAT(s.student_firstname, ' ', s.student_lastname ) as student 

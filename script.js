@@ -144,6 +144,37 @@ $(document).ready(function() {
   })
 
 
+  $(document).ready(function() {
+    $('select.gender').select2({
+      theme: "bootstrap4",
+      placeholder: 'Select Gender',
+      ajax: {
+          url: 'select_fetch.php',
+          type: 'post',
+          dataType: "json",
+          delay: 250, 
+          data: function(params) {
+              return {
+                  gender: true,
+                  term: params.term
+              };
+          },
+          processResults: function(data) {
+              return {
+                  results: $.map(data.results, function(gender) {
+                      return {
+                          id: gender.id,
+                          text: gender.gender_type
+                      };
+                  })
+              };
+          },
+          cache: true
+      },
+      minimumInputLength: 0,
+      allowClear: true
+    })
+    })
 
     
   document.addEventListener('DOMContentLoaded', function () {

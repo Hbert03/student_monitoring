@@ -4,14 +4,19 @@
 include('header.php');
 include('class.php');
 
-$elems = new Elementary();
-$totalElems = $elems->getValue("totalElems");
 
-$junior = new Junior_High();
-$totalJunior = $junior->getValue("totalJunior");
 
-$senior = new Senior_High();
-$totalSenior = $senior->getValue("totalSenior");
+$juniorm = new Junior_High_MAle();
+$totalJuniorm = $juniorm->getValue("totalJuniorm");
+
+$juniorf = new Junior_High_Female();
+$totalJuniorf = $juniorf->getValue("totalJuniorf");
+
+$seniorm = new Senior_High_Male();
+$totalSeniorm = $seniorm->getValue("totalSeniorm");
+
+$seniorf = new Senior_High_Female();
+$totalSeniorf = $seniorf->getValue("totalSeniorf");
 ?>
 
 
@@ -47,27 +52,27 @@ $totalSenior = $senior->getValue("totalSenior");
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
-          <div class="col-lg-4 col-6">
+       
+          <!-- ./col -->
+          <div class="col-lg-3 col-8">
             <!-- small box -->
-            <div class="small-box bg-primary">
+            <div class="small-box bg-info">
               <div class="inner">
-                <h3><?php echo $totalElems; ?></h3>
-
-                <p>ELEMENTARY</p>
+                <h4><?php echo $totalJuniorm ?> Male</h4>
+                <p>JUNIOR HIGH SCHOOL</p>
               </div>
               <div class="icon">
               <i class="nav-icon fas fa-user-graduate"></i>
               </div>
-    
+        
             </div>
           </div>
-          <!-- ./col -->
-          <div class="col-lg-4 col-6">
+               <!-- ./col -->
+               <div class="col-lg-3 col-8">
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3><?php echo $totalJunior ?></h3>
-
+                <h4><?php echo $totalJuniorf ?> Female</h4>
                 <p>JUNIOR HIGH SCHOOL</p>
               </div>
               <div class="icon">
@@ -77,11 +82,27 @@ $totalSenior = $senior->getValue("totalSenior");
             </div>
           </div>
           <!-- ./col -->
-          <div class="col-lg-4 col-6">
+       
+          <div class="col-lg-3 col-8">
             <!-- small box -->
             <div class="small-box bg-primary">
               <div class="inner">
-                <h3><?php echo $totalSenior ?></h3>
+                <h4><?php echo $totalSeniorm ?> Male</h4>
+
+                <p>SENIOR HIGH SCHOOL</p>
+              </div>
+              <div class="icon">
+              <i class="nav-icon fas fa-user-graduate"></i>
+              </div>
+         
+            </div>
+          </div>
+            
+          <div class="col-lg-3 col-8">
+            <!-- small box -->
+            <div class="small-box bg-primary">
+              <div class="inner">
+                <h4><?php echo $totalSeniorf ?> Female</h4>
 
                 <p>SENIOR HIGH SCHOOL</p>
               </div>

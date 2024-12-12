@@ -35,6 +35,40 @@ if (isset($_POST['gradelevel'])) {
 
 
 
+
+if (isset($_POST['gender'])) {
+    $query = "SELECT * FROM gender WHERE 1=1";
+
+    $terms = (isset($_POST['term']) && !empty($_POST['term'])) ? $_POST['term'] : null;
+
+    if ($terms) {
+        $query .= " AND gender_type LIKE ?";
+    } else {
+        $query .= " LIMIT 12";
+    }
+
+    $stmt = $conn->prepare($query);
+
+    if ($terms) {
+        $like_terms = "%" . $terms . "%";
+        $stmt->bind_param("s", $like_terms);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $school = array();
+
+    while ($row = $result->fetch_assoc()) {
+        $school[] = $row;
+    }
+
+    $stmt->close();
+    $conn->close();
+
+    echo json_encode(['results' => $school]);
+}
+
+
 if (isset($_POST['gradelevel1'])) {
     $query = "SELECT * FROM grade_level WHERE 1=1";
 

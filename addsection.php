@@ -27,7 +27,7 @@ include ('header.php');
   <div class="card">
     <div class="card-header">
       <button style="margin-left:1em" class="btn btn-primary float-right add_school_year"><span><i class="nav-icon fas fa-plus"></i></span>ADD SCHOOL YEAR</button>
-      <button class="btn btn-primary float-right add_subject"><span><i class="nav-icon fas fa-plus"></i></span>ADD SUBJECT</button>
+      <!-- <button class="btn btn-primary float-right add_subject"><span><i class="nav-icon fas fa-plus"></i></span>ADD SUBJECT</button> -->
     </div>
     <div class="card-body">
       <form id="addSectionForm">
@@ -47,21 +47,21 @@ include ('header.php');
       </form>
   </div>
 </section>
-
+<!-- 
 <div class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
           <h1 class="m-0">Add Class Schedule</h1>
-        </div><!-- /.col -->
+        </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
           </ol>
-        </div><!-- /.col -->
-      </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
+        </div>
+      </div>
+    </div>
   </div>
-  <!-- /.content-header -->
+
 <section class="content">
   <div class="card">
     <div class="card-body">
@@ -91,7 +91,7 @@ include ('header.php');
         </div>
       </form>
   </div>
-</section>
+</section> -->
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
