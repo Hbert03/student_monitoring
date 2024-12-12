@@ -34,7 +34,7 @@ include ('header.php');
                   <div class="btn-group w-100 mb-2">                   
                   </div>
                   <div class="mb-2">
-                    <a class="btn btn-light btn-lg" href="javascript:void(0)" data-shuffle>Grade Level </a>
+                    <a class="btn btn-light btn-lg" href="javascript:void(0)" data-shuffle><b>Grade Level </b></a>
                    
                   </div>
                 </div>
@@ -42,38 +42,38 @@ include ('header.php');
                   <div class="filter-container p-0 row">
                    
                   <div class="card filtr-item col-sm-2" data-category="1" data-sort="white sample">
-                      <img src="https://via.placeholder.com/300/FFFFFF?text=7" 
+                      <img src="img/2.png" 
                           class="img-fluid mb-2 grade-image" 
                           data-grade-level="7" 
                           alt="white sample" />
                     </div>
                     <div class="card filtr-item col-sm-2" data-category="2, 4" data-sort="white sample">
-                      <img src="https://via.placeholder.com/300/FFFFFF?text=8" 
+                      <img src="img/3.png" 
                           class="img-fluid mb-2 grade-image" 
                           data-grade-level="8" 
                           alt="black sample" />
                     </div>
 
                     <div class="card filtr-item col-sm-2" data-category="1" data-sort="white sample">
-                      <img src="https://via.placeholder.com/300/FFFFFF?text=9" 
+                      <img src="img/4.png" 
                           class="img-fluid mb-2 grade-image" 
                           data-grade-level="9" 
                           alt="white sample" />
                     </div>
                     <div class="card filtr-item col-sm-2" data-category="2, 4" data-sort="white sample">
-                      <img src="https://via.placeholder.com/300/FFFFFF?text=10" 
+                      <img src="img/1.png" 
                           class="img-fluid mb-2 grade-image" 
                           data-grade-level="10" 
                           alt="black sample" />
                     </div>
                     <div class="card filtr-item col-sm-2" data-category="1" data-sort="white sample">
-                      <img src="https://via.placeholder.com/300/FFFFFF?text=11" 
+                      <img src="img/11.png" 
                           class="img-fluid mb-2 grade-image" 
                           data-grade-level="11" 
                           alt="white sample" />
                     </div>
                     <div class=" card filtr-item col-sm-2" data-category="2, 4" data-sort="white sample">
-                      <img src="https://via.placeholder.com/300/FFFFFF?text=12" 
+                      <img src="img/12.png" 
                           class="img-fluid mb-2 grade-image" 
                           data-grade-level="12" 
                           alt="black sample" />
@@ -98,7 +98,7 @@ include ('header.php');
         </button>
       </div>
       <div class="modal-body">
-        <button class="btn btn-primary" id="bulk-update-btn">Update Bulk</button>
+        <button class="btn btn-primary float-right" id="bulk-update-btn">Update Students Grade Level</button>
         <!-- <select id="sort_grade_level" class="form-control w-25 sort_grade_level"></select> -->
         <div class="table-responsive">
           <table id="student" class="table table-bordered table-striped">
