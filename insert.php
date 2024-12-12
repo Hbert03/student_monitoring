@@ -5,49 +5,50 @@ require 'vendor/autoload.php';
 $apiKey = 'f770208e20af697387421fcf32ba90da';
 $student_id = intval($_POST['student_id']);
 
-// date_default_timezone_set('Asia/Manila');
-$current_time = date('H:i:s');
-$status = '';
+    date_default_timezone_set('Asia/Manila');
+    $current_time = new DateTime(date('H:i:s'));
+    $status = '';
 
-// Define attendance windows
-$attendance_windows = [
-    'morning_in' => ['07:00:00', '08:00:00'], 
-    'morning_out' => ['12:00:00', '12:59:59'], 
-    'afternoon_in' => ['13:00:00', '14:00:00'],
-    'afternoon_out' => ['16:00:00', '18:00:00'],
-];
+  
+    $windows = [
+        'morning_in' => [new DateTime('07:00:00'), new DateTime('08:00:00')],
+        'morning_out' => [new DateTime('12:00:00'), new DateTime('12:59:59')],
+        'afternoon_in' => [new DateTime('13:00:00'), new DateTime('14:00:00')],
+        'afternoon_out' => [new DateTime('16:00:00'), new DateTime('18:00:00')],
+    ];
+    
+    // Check if student exists
+    $sql_check_student = "SELECT student_id FROM student WHERE student_id = ?";
+    $stmt_check = $conn->prepare($sql_check_student);
+    $stmt_check->bind_param("i", $student_id);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
+    $student_exists = $result_check->num_rows > 0;
+    $stmt_check->close();
 
-// Check if student exists
-$sql_check_student = "SELECT student_id FROM student WHERE student_id = ?";
-$stmt_check = $conn->prepare($sql_check_student);
-$stmt_check->bind_param("i", $student_id);
-$stmt_check->execute();
-$result_check = $stmt_check->get_result();
-$student_exists = $result_check->num_rows > 0;
-$stmt_check->close();
+    if (!$student_exists) {
+        echo json_encode(['status' => 'error', 'message' => 'Student not found.']);
+        exit;
+    }
 
-if (!$student_exists) {
-    echo json_encode(['status' => 'error', 'message' => 'Student not found.']);
-    exit;
-}
-
-// Determine attendance status
-if ($current_time >= $attendance_windows['morning_in'][0] && $current_time <= $attendance_windows['morning_in'][1]) {
-    $status = 'IN';
-} elseif ($current_time > $attendance_windows['morning_in'][1] && $current_time < $attendance_windows['morning_out'][0]) {
-    $status = 'LATE'; 
-} elseif ($current_time >= $attendance_windows['morning_out'][0] && $current_time <= $attendance_windows['morning_out'][1]) {
-    $status = 'OUT'; 
-} elseif ($current_time >= $attendance_windows['afternoon_in'][0] && $current_time <= $attendance_windows['afternoon_in'][1]) {
-    $status = 'IN'; 
-} elseif ($current_time > $attendance_windows['afternoon_in'][1] && $current_time < $attendance_windows['afternoon_out'][0]) {
-    $status = 'LATE'; 
-} elseif ($current_time >= $attendance_windows['afternoon_out'][0] && $current_time <= $attendance_windows['afternoon_out'][1]) {
-    $status = 'OUT'; 
-} else {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid attendance time.']);
-    exit;
-}
+    // Determine attendance status
+    if ($current_time >= $windows['morning_in'][0] && $current_time <= $windows['morning_in'][1]) {
+        $status = 'IN';
+    } elseif ($current_time > $windows['morning_in'][1] && $current_time < $windows['morning_out'][0]) {
+        $status = 'LATE';
+    } elseif ($current_time >= $windows['morning_out'][0] && $current_time <= $windows['morning_out'][1]) {
+        $status = 'OUT';
+    } elseif ($current_time >= $windows['afternoon_in'][0] && $current_time <= $windows['afternoon_in'][1]) {
+        $status = 'IN';
+    } elseif ($current_time > $windows['afternoon_in'][1] && $current_time < $windows['afternoon_out'][0]) {
+        $status = 'LATE';
+    } elseif ($current_time >= $windows['afternoon_out'][0] && $current_time <= $windows['afternoon_out'][1]) {
+        $status = 'OUT';
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid attendance time.']);
+        exit;
+    }
+    
 
 
 // Fetch parent details

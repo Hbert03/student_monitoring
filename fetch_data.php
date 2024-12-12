@@ -24,7 +24,7 @@ if (isset($_POST['fetch'])) {
 
         $query1 = "SELECT s.*, CONCAT(s.student_firstname, ' ', COALESCE(SUBSTRING(s.student_middlename, 1, 1), ''), '. ', s.student_lastname) AS fullname , g.grade_level_name
                    FROM student s INNER JOIN grade_level g ON g.grade_level = s.grade_level_id
-                   WHERE 1=1";
+                   WHERE s.grade_level_id='$gradeLevel'";
 
         if (!empty($search)) {
             $query1 .= " AND (CONCAT(student_firstname, ' ', student_middlename, ' ', student_lastname) LIKE '%" . $conn->real_escape_string($search) . "%')";
@@ -930,4 +930,26 @@ if (isset($_POST['mysubject'])) {
     exit();
 }
 
+
+if (isset($_POST['bulkUpdate'])) {
+    $student_ids = $_POST['student_ids'];
+    $grade_level_id = intval($_POST['grade_level_id']);
+
+    if (!empty($student_ids)) {
+        $placeholders = implode(',', array_fill(0, count($student_ids), '?'));
+        $stmt = $conn->prepare("UPDATE student SET grade_level_id = ? WHERE student_id IN ($placeholders)");
+        $types = str_repeat('i', count($student_ids) + 1);
+        $params = array_merge([$grade_level_id], $student_ids);
+        $stmt->bind_param($types, ...$params);
+
+        if ($stmt->execute()) {
+            echo "Updated Successfully";
+        } else {
+            echo "Update Failed";
+        }
+        $stmt->close();
+    } else {
+        echo "No Students Selected";
+    }
+}
 ?>

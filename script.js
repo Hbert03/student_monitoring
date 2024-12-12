@@ -483,7 +483,7 @@ $(document).ready(function() {
             $(document).ready(function() {
                 $('select.section').select2({
                   theme: "bootstrap4",
-                  placeholder: 'Select Grade level',
+                  placeholder: 'Select Section',
                   ajax: {
                       url: 'select_fetch.php',
                       type: 'post',
@@ -736,51 +736,11 @@ $(document).ready(function() {
 
 
 
-
-
-$(document).ready(function() {
-    function initializeSelect2() {
-        $('select.sort_grade_level').select2({
-            theme: "bootstrap4",
-            placeholder: 'Sort By Grade Level',
-            ajax: {
-                url: 'select_fetch.php',
-                type: 'POST',
-                dataType: "json",
-                delay: 250,
-                data: function(params) {
-                    return {
-                        gradelevel1: true,
-                        term: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: $.map(data.results, function(grade) {
-                            return {
-                                id: grade.grade_level,
-                                text: grade.grade_level_name
-                            };
-                        })
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 0,
-            allowClear: true
-        });
-        $(".select2-container").css("margin-bottom", "1em");
-    }
-
-
-    initializeSelect2();
-
-   
+$(document).ready(function () {
+    // Initialize DataTable
     var table = $('#student').DataTable({
-        dom: 'lBfrtip',  
-        buttons: [
-            'copy', 'excel' 
-        ],
+        dom: 'lBfrtip',
+        buttons: ['copy', 'excel'],
         serverSide: true,
         lengthChange: true,
         responsive: true,
@@ -788,48 +748,183 @@ $(document).ready(function() {
         ajax: {
             url: "fetch_data.php",
             type: "POST",
-            data: function(d) {
+            data: function (d) {
                 d.fetch = true;
-                d.grade_level = $('select.sort_grade_level').val();
+                d.grade_level = window.selectedGradeLevel; 
             },
-            error: function(xhr, error, thrown) {
+            error: function (xhr, error, thrown) {
                 console.log("Ajax Failed: " + thrown);
             }
         },
         columns: [
+            {
+                "data": null,
+                "orderable": false,
+                "searchable": false,
+                "render": function (data, type, row) {
+                    return `<input type="checkbox" class="student-checkbox" value="${row.student_id}">`;
+                }
+            },
             { "data": "fullname" },
             { "data": "student_mobile" },
             { "data": "student_address" },
             { "data": "grade_level_name" },
-            { 
+            {
                 "data": "qrcode",
                 "orderable": false,
                 "searchable": false,
-                "render": function(data, type, row) {
+                "render": function (data, type, row) {
                     return data;
                 }
             },
-            {"data": null,
-                "render": function(data, type, row){
-                    return "<button class='btn btn-info btn-sm edit' data-student='"+row.student_id+"'>Edit<span><i style='margin-left:2px' class='fas fa-pen'></i></span></button>";
+            {
+                "data": null,
+                "render": function (data, type, row) {
+                    return "<button class='btn btn-info btn-sm edit' data-student='" + row.student_id + "'>Edit<span><i style='margin-left:2px' class='fas fa-pen'></i></span></button>";
                 }
             },
-            {"data": null,
-                "render": function(data, type, row){
-                    return "<button class='btn btn-danger btn-sm delete' data-student='"+ row.student_id+"'>Delete<span><i style='margin-left:2px' class='fas fa-trash'></i></span></button>";
+            {
+                "data": null,
+                "render": function (data, type, row) {
+                    return "<button class='btn btn-danger btn-sm delete' data-student='" + row.student_id + "'>Delete<span><i style='margin-left:2px' class='fas fa-trash'></i></span></button>";
                 }
             }
         ],
-        drawCallback: function(){
+        initComplete: function () {
+            // Add a "Check All" checkbox in the header
+            $('#student thead tr').prepend(`
+                <th>
+                    <input type="checkbox" id="check-all">
+                </th>
+            `);
+    
+            // Add a "Check All" checkbox for the body
+            $('#student tbody tr').each(function () {
+                $(this).prepend('<td></td>');
+            });
+    
+            // Handle Check All functionality
+            $('#check-all').on('click', function () {
+                var isChecked = $(this).is(':checked');
+                $('.student-checkbox').prop('checked', isChecked);
+            });
+        },
+        drawCallback: function () {
+             // Sync Check All checkbox state with row checkboxes
+        const totalCheckboxes = $('.student-checkbox').length;
+        const checkedCheckboxes = $('.student-checkbox:checked').length;
+        $('#check-all').prop('checked', totalCheckboxes > 0 && totalCheckboxes === checkedCheckboxes);
+  
             deletedstudent();
             editstudent();
         }
     });
 
 
-    $('select.sort_grade_level').on('change', function() {
-        table.draw();
+
+
+    $('.grade-image').on('click', function () {
+        const gradeLevel = $(this).data('grade-level'); 
+
+
+        window.selectedGradeLevel = gradeLevel;
+        table.ajax.reload();
+
+        // Show the modal
+        $('#student-modal').modal('show');
     });
+
+
+
+    $('#bulk-update-btn').on('click', function () {
+        const selectedStudents = [];
+        $('.student-checkbox:checked').each(function () {
+            selectedStudents.push($(this).val());
+        });
+
+        if (selectedStudents.length === 0) {
+            Swal.fire('No Selection', 'Please select at least one student.', 'info');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Bulk Update Grade Level',
+            html: '<label>Grade Level:</label>' +
+                '<select id="bulk-grade-level" class="form-control select2"></select>',
+            focusConfirm: false,
+            confirmButtonText: 'Update',
+            didOpen: () => {
+                $('.select2').select2();
+
+                $('#bulk-grade-level').select2({
+                    theme: "bootstrap4",
+                    placeholder: 'Select Grade level',
+                    ajax: {
+                        url: 'select_fetch.php',
+                        type: 'post',
+                        dataType: "json",
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                gradelevel: true,
+                                term: params.term
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: $.map(data.results, function (grade) {
+                                    return {
+                                        id: grade.grade_level,
+                                        text: grade.grade_level_name
+                                    };
+                                })
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 0,
+                    allowClear: true
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const gradeLevelId = $('#bulk-grade-level').val();
+                if (!gradeLevelId) {
+                    Swal.fire('Error', 'Please select a grade level.', 'error');
+                    return;
+                }
+
+                // Send AJAX request for bulk update
+                $.ajax({
+                    url: 'fetch_data.php',
+                    type: 'POST',
+                    data: {
+                        bulkUpdate: true,
+                        student_ids: selectedStudents,
+                        grade_level_id: gradeLevelId
+                    },
+                    success: function (response) {
+                        if (response.trim() === "Updated Successfully") {
+                            Swal.fire(
+                                'Updated!',
+                                'Selected students have been updated successfully.',
+                                'success'
+                            ).then(() => {
+                                table.ajax.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Failed!',
+                                'Bulk update failed. Please try again.',
+                                'error'
+                            );
+                        }
+                    }
+                });
+            }
+        });
+    });
+
 
     function editstudent() {
         $('#student').on('click', 'button.edit', function() {
@@ -1833,3 +1928,4 @@ toastr.options = {
     "positionClass": "toast-top-right",
     "timeOut": "5000"
 }
+
