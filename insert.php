@@ -1,80 +1,80 @@
 <?php
 include('database.php');
-require 'vendor/autoload.php'; 
+require 'vendor/autoload.php';
 
 $apiKey = 'f770208e20af697387421fcf32ba90da';
 $student_id = intval($_POST['student_id']);
 
-    date_default_timezone_set('Asia/Manila');
-    $current_time = new DateTime(date('H:i:s'));
-    $status = '';
+date_default_timezone_set('Asia/Manila');
+$current_time = new DateTime(date('H:i:s'));
+$status = '';
 
-  
-    $windows = [
-        'morning_in' => [new DateTime('07:00:00'), new DateTime('08:00:00')],
-        'morning_out' => [new DateTime('12:00:00'), new DateTime('12:59:59')],
-        'afternoon_in' => [new DateTime('13:00:00'), new DateTime('14:00:00')],
-        'afternoon_out' => [new DateTime('16:00:00'), new DateTime('18:00:00')],
-    ];
-    function markAbsentIfNoScan($student_id, $conn) {
-        $current_date = date('Y-m-d');  
+$windows = [
+    'morning_in' => [new DateTime('07:00:00'), new DateTime('08:00:00')],
+    'morning_out' => [new DateTime('12:00:00'), new DateTime('12:59:59')],
+    'afternoon_in' => [new DateTime('13:00:00'), new DateTime('14:00:00')],
+    'afternoon_out' => [new DateTime('16:00:00'), new DateTime('18:00:00')],
+];
+
+// Function to mark students as absent after the afternoon out window
+function markAbsentIfNoScan($student_id, $conn) {
+    $current_date = date('Y-m-d');  
+
+    // Check if an attendance record already exists for today
+    $sql_check_attendance = "SELECT * FROM attendance WHERE student_id = ? AND DATE(date) = ?";
+    $stmt_check_attendance = $conn->prepare($sql_check_attendance);
+    $stmt_check_attendance->bind_param("is", $student_id, $current_date);
+    $stmt_check_attendance->execute();
+    $result_check_attendance = $stmt_check_attendance->get_result();
     
-  
-        $sql_check_attendance = "SELECT * FROM attendance WHERE student_id = ? AND DATE(date) = ?";
-        $stmt_check_attendance = $conn->prepare($sql_check_attendance);
-        $stmt_check_attendance->bind_param("is", $student_id, $current_date);
-        $stmt_check_attendance->execute();
-        $result_check_attendance = $stmt_check_attendance->get_result();
-    
-        if ($result_check_attendance->num_rows == 0) {
-            $sql_absent = "INSERT INTO attendance (student_id, status, date) VALUES (?, 'ABSENT', NOW())";
-            $stmt_absent = $conn->prepare($sql_absent);
-            $stmt_absent->bind_param("i", $student_id);
-            if ($stmt_absent->execute()) {
-                echo json_encode(['status' => 'success', 'message' => 'Student marked as absent.']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'Error marking student as absent.']);
-            }
-            $stmt_absent->close();
+    // If no attendance record exists, mark the student as absent
+    if ($result_check_attendance->num_rows == 0) {
+        $sql_absent = "INSERT INTO attendance (student_id, status, date) VALUES (?, 'ABSENT', NOW())";
+        $stmt_absent = $conn->prepare($sql_absent);
+        $stmt_absent->bind_param("i", $student_id);
+        if ($stmt_absent->execute()) {
+            echo json_encode(['status' => 'success', 'message' => 'Student marked as absent.']);
         } else {
-            echo json_encode(['status' => 'info', 'message' => 'Attendance already recorded for today.']);
+            echo json_encode(['status' => 'error', 'message' => 'Error marking student as absent.']);
         }
-        $stmt_check_attendance->close();
-    }
-    
-    
-    $sql_check_student = "SELECT student_id FROM student WHERE student_id = ?";
-    $stmt_check = $conn->prepare($sql_check_student);
-    $stmt_check->bind_param("i", $student_id);
-    $stmt_check->execute();
-    $result_check = $stmt_check->get_result();
-    $student_exists = $result_check->num_rows > 0;
-    $stmt_check->close();
-
-    if (!$student_exists) {
-        echo json_encode(['status' => 'error', 'message' => 'Student not found.']);
-        exit;
-    }
-
-    // Determine attendance status
-    if ($current_time >= $windows['morning_in'][0] && $current_time <= $windows['morning_in'][1]) {
-        $status = 'IN';
-    } elseif ($current_time > $windows['morning_in'][1] && $current_time < $windows['morning_out'][0]) {
-        $status = 'LATE';
-    } elseif ($current_time >= $windows['morning_out'][0] && $current_time <= $windows['morning_out'][1]) {
-        $status = 'OUT';
-    } elseif ($current_time >= $windows['afternoon_in'][0] && $current_time <= $windows['afternoon_in'][1]) {
-        $status = 'IN';
-    } elseif ($current_time > $windows['afternoon_in'][1] && $current_time < $windows['afternoon_out'][0]) {
-        $status = 'LATE';
-    } elseif ($current_time >= $windows['afternoon_out'][0] && $current_time <= $windows['afternoon_out'][1]) {
-        $status = 'OUT';
+        $stmt_absent->close();
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid attendance time.']);
-        exit;
+        echo json_encode(['status' => 'info', 'message' => 'Attendance already recorded for today.']);
     }
-    
+    $stmt_check_attendance->close();
+}
 
+// Check if student exists
+$sql_check_student = "SELECT student_id FROM student WHERE student_id = ?";
+$stmt_check = $conn->prepare($sql_check_student);
+$stmt_check->bind_param("i", $student_id);
+$stmt_check->execute();
+$result_check = $stmt_check->get_result();
+$student_exists = $result_check->num_rows > 0;
+$stmt_check->close();
+
+if (!$student_exists) {
+    echo json_encode(['status' => 'error', 'message' => 'Student not found.']);
+    exit;
+}
+
+// Determine attendance status
+if ($current_time >= $windows['morning_in'][0] && $current_time <= $windows['morning_in'][1]) {
+    $status = 'IN';
+} elseif ($current_time > $windows['morning_in'][1] && $current_time < $windows['morning_out'][0]) {
+    $status = 'LATE';
+} elseif ($current_time >= $windows['morning_out'][0] && $current_time <= $windows['morning_out'][1]) {
+    $status = 'OUT';
+} elseif ($current_time >= $windows['afternoon_in'][0] && $current_time <= $windows['afternoon_in'][1]) {
+    $status = 'IN';
+} elseif ($current_time > $windows['afternoon_in'][1] && $current_time < $windows['afternoon_out'][0]) {
+    $status = 'LATE';
+} elseif ($current_time >= $windows['afternoon_out'][0] && $current_time <= $windows['afternoon_out'][1]) {
+    $status = 'OUT';
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid attendance time.']);
+    exit;
+}
 
 // Fetch parent details
 $sql = "SELECT t.parent_mobile, t.parent_name, t.email, CONCAT(s.student_firstname, ' ', s.student_lastname ) as student 
@@ -151,7 +151,11 @@ if ($parent) {
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Parent details not found.']);
 }
-markAbsentIfNoScan($student_id, $conn);
+
+// Check if the current time is after the afternoon out window
+if ($current_time > $windows['afternoon_out'][1]) {
+    markAbsentIfNoScan($student_id, $conn);
+}
+
 $conn->close();
 ?>
-                                

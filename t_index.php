@@ -153,11 +153,11 @@ if (!isset($_SESSION['user_id'])) {
         </button>
       </div>
       <div class="modal-body">
-        <div class="row">
-          <label>From</label>
-          <input type="date" class="form-control w-25 me-3" name="from" id="from_date">
-          <label>To</label>
-          <input type="date" class="form-control w-25" name="to" id="to_date">
+        <div class="row ">
+          <label style="margin-right:.5em">From</label>
+          <input style="margin-right:1em" type="date" class="form-control w-25 mb-2" name="from" id="from_date">
+          <label style="margin-right:.5em">To</label>
+          <input type="date" class="form-control w-25 mb-2" name="to" id="to_date">
         </div>
         <div class="table-responsive">
           <table id="Absent_generate" class="table table-bordered table-striped">
