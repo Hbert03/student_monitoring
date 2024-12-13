@@ -119,6 +119,10 @@ include ('header.php');
                         <select class="form-control school_year" name="school_year" required></select>
                     </div>
                     <div class="form-group col-md-4">
+                        <label for="address">Teacher</label>
+                        <select class="form-control teacher" name="teacher" required></select>
+                    </div>
+                    <div class="form-group col-md-4">
                         <label for="address">Student</label>
                         <select class="form-control student" name="student[]" multiple="multiple" required></select>
                     </div>

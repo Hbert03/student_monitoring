@@ -1885,7 +1885,7 @@ $(document).ready(function() {
     initializeSelect2();
 
    
-    var table = $('#mysubject').DataTable({
+    var table = $('#mySection').DataTable({
         dom: 'lBfrtip',  
         buttons: [
             'copy', 'excel' 
@@ -1897,16 +1897,15 @@ $(document).ready(function() {
         ajax: {
             url: "fetch_data.php",
             type: "POST",
-            data: function(d) {
-                d.mysubject = true;
-                d.subject = $('select.sort_subject').val(); 
+            data:  {
+                mysubject : true,
             },
             error: function(xhr, error, thrown) {
                 console.log("Ajax Failed: " + thrown);
             }
         },
         columns: [
-            { "data": "fullname" },
+            { "data": "section_name" },
             { "data": "grade_level_name" },
         ],
         drawCallback: function(){
@@ -1929,3 +1928,38 @@ toastr.options = {
     "timeOut": "5000"
 }
 
+
+$(document).ready(function() {
+
+    var table = $('#Absent_generate').DataTable({
+        dom: 'lBfrtip',
+        buttons: [
+            'copy', 'excel'
+        ],
+        serverSide: true,
+        lengthChange: true,
+        responsive: true,
+        autoWidth: false,
+        ajax: {
+            url: 'fetch_data.php',
+            type: 'POST',
+            data: function(d) {
+                d.absent = true;
+                d.from = $('#from_date').val();
+                d.to = $('#to_date').val();
+            },
+            error: function(xhr, error, thrown) {
+                console.log('Ajax Failed: ' + thrown);
+            }
+        },
+        columns: [
+            { "data": "fullname" },
+            { "data": "absent_days" }
+        ]
+    });
+
+    // Handle date range change
+    $('#from_date, #to_date').on('change', function() {
+        table.ajax.reload();
+    });
+});

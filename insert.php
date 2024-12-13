@@ -16,8 +16,33 @@ $student_id = intval($_POST['student_id']);
         'afternoon_in' => [new DateTime('13:00:00'), new DateTime('14:00:00')],
         'afternoon_out' => [new DateTime('16:00:00'), new DateTime('18:00:00')],
     ];
+    function markAbsentIfNoScan($student_id, $conn) {
+        $current_date = date('Y-m-d');  
     
-    // Check if student exists
+  
+        $sql_check_attendance = "SELECT * FROM attendance WHERE student_id = ? AND DATE(date) = ?";
+        $stmt_check_attendance = $conn->prepare($sql_check_attendance);
+        $stmt_check_attendance->bind_param("is", $student_id, $current_date);
+        $stmt_check_attendance->execute();
+        $result_check_attendance = $stmt_check_attendance->get_result();
+    
+        if ($result_check_attendance->num_rows == 0) {
+            $sql_absent = "INSERT INTO attendance (student_id, status, date) VALUES (?, 'ABSENT', NOW())";
+            $stmt_absent = $conn->prepare($sql_absent);
+            $stmt_absent->bind_param("i", $student_id);
+            if ($stmt_absent->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'Student marked as absent.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Error marking student as absent.']);
+            }
+            $stmt_absent->close();
+        } else {
+            echo json_encode(['status' => 'info', 'message' => 'Attendance already recorded for today.']);
+        }
+        $stmt_check_attendance->close();
+    }
+    
+    
     $sql_check_student = "SELECT student_id FROM student WHERE student_id = ?";
     $stmt_check = $conn->prepare($sql_check_student);
     $stmt_check->bind_param("i", $student_id);
@@ -126,7 +151,7 @@ if ($parent) {
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Parent details not found.']);
 }
-
+markAbsentIfNoScan($student_id, $conn);
 $conn->close();
 ?>
                                 

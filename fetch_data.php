@@ -645,12 +645,8 @@ if (isset($_POST['viewstudent'])) {
 
 if (isset($_POST['attendance'])) {
 
-    function getAttendanceData($draw, $start, $length, $search, $teacher_id) {
-        global $conn;
-        global $teacher_id;
-
+    function getAttendanceData($draw, $start, $length, $search, $teacher_id, $conn) {
         $sortableColumns = array('fullname', 'date', 'in_out_status'); 
-        
         $orderBy = $sortableColumns[0];
         $orderDir = 'ASC';
 
@@ -665,83 +661,141 @@ if (isset($_POST['attendance'])) {
 
         $query = "WITH RankedAttendance AS (
             SELECT 
-                a.*, 
+                a.student_id,
                 CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname,
-                ROW_NUMBER() OVER (PARTITION BY a.student_id ORDER BY a.date ASC) AS row_num
+                CASE
+                    WHEN TIME(a.date) BETWEEN '07:00:00' AND '08:00:00' THEN 'IN'
+                    WHEN TIME(a.date) > '08:00:00' AND TIME(a.date) < '12:00:00' THEN 'LATE'
+                    WHEN TIME(a.date) BETWEEN '12:00:00' AND '12:59:59' THEN 'OUT'
+                    WHEN TIME(a.date) BETWEEN '13:00:00' AND '14:00:00' THEN 'IN'
+                    WHEN TIME(a.date) > '14:00:00' AND TIME(a.date) < '16:00:00' THEN 'LATE'
+                    WHEN TIME(a.date) BETWEEN '16:00:00' AND '18:00:00' THEN 'OUT'
+                    ELSE 'INVALID'
+                END AS status,
+                a.date,
+                ROW_NUMBER() OVER (PARTITION BY a.student_id, 
+                   CASE 
+                       WHEN TIME(a.date) BETWEEN '07:00:00' AND '08:00:00' THEN 'morning_in'
+                       WHEN TIME(a.date) BETWEEN '12:00:00' AND '12:59:59' THEN 'morning_out'
+                       WHEN TIME(a.date) BETWEEN '13:00:00' AND '14:00:00' THEN 'afternoon_in'
+                       WHEN TIME(a.date) BETWEEN '16:00:00' AND '18:00:00' THEN 'afternoon_out'
+                   END
+                   ORDER BY a.date ASC) AS row_num
             FROM attendance a
             INNER JOIN student st ON a.student_id = st.student_id
             INNER JOIN student_section ss ON a.student_id = ss.student_id
-            INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
-            WHERE cs.teacher_id = ? AND DATE(a.date) = CURDATE()";
+            INNER JOIN teacher te ON te.teacher_id = ss.teacher_id
+            WHERE te.teacher_id = ? 
+            AND DATE(a.date) = CURDATE()";
 
-            if (!empty($search)) {
-                $escapedSearch = $conn->real_escape_string($search);
-                $query .= " AND (st.student_firstname LIKE '%$escapedSearch%' OR st.student_lastname LIKE '%$escapedSearch%')";
-            }
-
-            $query .= ") 
-                    SELECT * 
-                    FROM RankedAttendance
-                    WHERE row_num = 1
-                    ORDER BY " . $orderBy . " " . $orderDir . " 
-                    LIMIT " . intval($start) . ", " . intval($length);
-
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("i", $teacher_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-
-        $totalQuery = "WITH RankedAttendance AS (
-                    SELECT 
-                        a.student_id, 
-                        ROW_NUMBER() OVER (PARTITION BY a.student_id ORDER BY a.date ASC) AS row_num
-                    FROM attendance a
-                    INNER JOIN student st ON a.student_id = st.student_id
-                    INNER JOIN student_section ss ON a.student_id = ss.student_id
-                    INNER JOIN class_schedule cs ON cs.section_id = ss.section_id 
-                    WHERE cs.teacher_id = ? AND DATE(a.date) = CURDATE()
-                )
-                    SELECT COUNT(*) AS total_count
-                    FROM RankedAttendance
-                    WHERE row_num = 1;
-                    ";
-        
         if (!empty($search)) {
-            $totalQuery .= " AND (st.student_firstname LIKE '%$escapedSearch%' OR st.student_lastname LIKE '%$escapedSearch%')";
+            $query .= " AND (st.student_firstname LIKE ? OR st.student_lastname LIKE ?)";
         }
 
-        $stmtTotal = $conn->prepare($totalQuery);
-        $stmtTotal->bind_param('i', $teacher_id);
-        $stmtTotal->execute();
-        $totalResult = $stmtTotal->get_result();
-        $totalRow = $totalResult->fetch_assoc();
-        $totalRecords = $totalRow['total_count'];
+        $query .= ") 
+                   SELECT student_id, fullname, status, date
+                    FROM RankedAttendance
+                    WHERE row_num = 1
+                    AND status IN ('IN', 'LATE', 'OUT')
+                    ORDER BY date ASC
+                    LIMIT ?, ?";
 
-        $data = array();
+        $stmt = $conn->prepare($query);
+        if (!$stmt) {
+            die("Query preparation failed: " . $conn->error);
+        }
+
+        if (!empty($search)) {
+            $escapedSearch = '%' . $search . '%';
+            $stmt->bind_param("issii", $teacher_id, $escapedSearch, $escapedSearch, $start, $length);
+        } else {
+            $stmt->bind_param("iii", $teacher_id, $start, $length);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $totalQuery = "WITH RankedAttendance AS (
+            SELECT 
+                a.student_id,
+                CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname,
+                CASE
+                    WHEN TIME(a.date) BETWEEN '07:00:00' AND '08:00:00' THEN 'IN'
+                    WHEN TIME(a.date) > '08:00:00' AND TIME(a.date) < '12:00:00' THEN 'LATE'
+                    WHEN TIME(a.date) BETWEEN '12:00:00' AND '12:59:59' THEN 'OUT'
+                    WHEN TIME(a.date) BETWEEN '13:00:00' AND '14:00:00' THEN 'IN'
+                    WHEN TIME(a.date) > '14:00:00' AND TIME(a.date) < '16:00:00' THEN 'LATE'
+                    WHEN TIME(a.date) BETWEEN '16:00:00' AND '18:00:00' THEN 'OUT'
+                    ELSE 'INVALID'
+                END AS status,
+                ROW_NUMBER() OVER (PARTITION BY a.student_id, 
+                   CASE 
+                       WHEN TIME(a.date) BETWEEN '07:00:00' AND '08:00:00' THEN 'morning_in'
+                       WHEN TIME(a.date) BETWEEN '12:00:00' AND '12:59:59' THEN 'morning_out'
+                       WHEN TIME(a.date) BETWEEN '13:00:00' AND '14:00:00' THEN 'afternoon_in'
+                       WHEN TIME(a.date) BETWEEN '16:00:00' AND '18:00:00' THEN 'afternoon_out'
+                   END
+                   ORDER BY a.date ASC) AS row_num
+            FROM attendance a
+            INNER JOIN student st ON a.student_id = st.student_id
+            INNER JOIN student_section ss ON a.student_id = ss.student_id
+            INNER JOIN teacher te ON te.teacher_id = ss.teacher_id
+            WHERE te.teacher_id = ? 
+            AND DATE(a.date) = CURDATE()";
+
+            if (!empty($search)) {
+                $totalQuery .= " AND (st.student_firstname LIKE ? OR st.student_lastname LIKE ?)";
+            }
+
+            $totalQuery .= ")
+            SELECT COUNT(*) AS total_count
+            FROM RankedAttendance
+            WHERE row_num = 4";
+
+
+                $stmtTotal = $conn->prepare($totalQuery);
+                if (!$stmtTotal) {
+                die("Total query preparation failed: " . $conn->error);
+                }
+
+                // Bind parameters
+                if (!empty($search)) {
+                $escapedSearch = '%' . $search . '%';
+                $stmtTotal->bind_param('iss', $teacher_id, $escapedSearch, $escapedSearch);
+                } else {
+                $stmtTotal->bind_param('i', $teacher_id);
+                }
+
+                // Execute query
+                $stmtTotal->execute();
+                $totalResult = $stmtTotal->get_result();
+                $totalRow = $totalResult->fetch_assoc();
+                $totalRecords = $totalRow['total_count'];
+
+
+        $data = [];
         while ($row = $result->fetch_assoc()) {
             $data[] = $row;
         }
 
-        $output = array(
+        return json_encode([
             "draw" => intval($draw),
             "recordsTotal" => intval($totalRecords),
-            "recordsFiltered" => intval($totalRecords), 
+            "recordsFiltered" => intval($totalRecords),
             "data" => $data
-        );
-
-        return json_encode($output);
+        ]);
     }
 
     $draw = $_POST["draw"];
     $start = $_POST["start"];
     $length = $_POST["length"];
-    $search = isset($_POST["search"]["value"]) ? $_POST["search"]["value"] : '';
+    $search = $_POST["search"]["value"] ?? '';
     $teacher_id = $_SESSION["teacher_id"];
 
-    echo getAttendanceData($draw, $start, $length, $search, $teacher_id);
+    echo getAttendanceData($draw, $start, $length, $search, $teacher_id, $conn);
     exit();
 }
+
 
 
 
@@ -824,81 +878,72 @@ if (isset($_POST['classSec'])) {
     exit();
 }
 
+
 if (isset($_POST['mysubject'])) {
 
-    function getsubjectList($draw, $start, $length, $search, $teacher_id, $subject_id) {
+    function getsubjectList($draw, $start, $length, $search, $teacher_id) {
         global $conn;
 
-        $sortableColumns = array('fullname', 'date', 'in_out_status'); 
+        $sortableColumns = array('section_name', 'grade_level_name');
         
-        $orderBy = $sortableColumns[0];
-        $orderDir = 'ASC';
+        $orderBy = $sortableColumns[0]; // Default order
+        $orderDir = 'ASC'; // Default direction
 
         if (isset($_POST['order'][0]['column']) && isset($_POST['order'][0]['dir'])) {
             $columnIdx = intval($_POST['order'][0]['column']);
             $orderDir = $_POST['order'][0]['dir'];
 
+            // Ensure order column exists in the array
             if (isset($sortableColumns[$columnIdx])) {
                 $orderBy = $sortableColumns[$columnIdx];
             }
         }
 
-        // Prepare query with teacher and subject filters
-        $query1 = "SELECT gr.grade_level_name, st.*, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname
-                   FROM student st 
-                   INNER JOIN student_section sts ON st.student_id = sts.student_id
-                   INNER JOIN section se ON sts.section_id = se.section_id 
-                   INNER JOIN class_schedule cs ON se.section_id = cs.section_id 
-                   INNER JOIN grade_level gr ON gr.grade_level = se.grade_level_id
-                   INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+        // Main query with teacher and subject filters
+        $query1 = "SELECT se.section_name, gr.grade_level_name
+                   FROM section se 
+                   INNER JOIN grade_level gr ON gr.grade_level = se.grade_level_id 
+                   INNER JOIN student_section sec ON se.section_id = sec.section_id
+                   INNER JOIN teacher te ON te.teacher_id = sec.teacher_id
                    WHERE te.teacher_id = ?";
-
-        // Add subject filter if subject_id is provided
-        if (!is_null($subject_id)) {
-            $query1 .= " AND cs.subject_id = ?";
-        }
 
         // Add search filter
         if (!empty($search)) {
-            $escapedSearch = $conn->real_escape_string($search);
-            $query1 .= " AND (st.student_firstname LIKE '%$escapedSearch%')";
+            $query1 .= " AND (se.section_name LIKE ?)";
         }
 
-        $query1 .= " ORDER BY " . $orderBy . " " . $orderDir . " LIMIT " . intval($start) . ", " . intval($length);
-
+        $query1 .= " ORDER BY $orderBy $orderDir LIMIT ?, ?";
         $stmt = $conn->prepare($query1);
-        
-        // Bind teacher_id and subject_id (if provided)
-        if (is_null($subject_id)) {
-            $stmt->bind_param('i', $teacher_id);
+
+        if (!empty($search)) {
+            $likeSearch = '%' . $search . '%';
+            $stmt = $conn->prepare($query1);
+            if (!$stmt) {
+                die("Prepare failed: " . $conn->error);
+            }
+            $stmt->bind_param("siii", $likeSearch, $teacher_id, $start, $length);
         } else {
-            $stmt->bind_param('ii', $teacher_id, $subject_id);
+            $stmt = $conn->prepare($query1);
+            if (!$stmt) {
+                die("Prepare failed: " . $conn->error);
+            }
+            $stmt->bind_param("iii", $teacher_id, $start, $length);
         }
         
+
         $stmt->execute();
         $result1 = $stmt->get_result();
 
         // Count query for total records
-        $totalQuery1 = "SELECT COUNT(*) AS total_count 
-                        FROM student st 
-                        INNER JOIN student_section sts ON st.student_id = sts.student_id 
-                        INNER JOIN section se ON sts.section_id = se.section_id 
-                        INNER JOIN class_schedule cs ON se.section_id = cs.section_id 
-                        INNER JOIN teacher te ON cs.teacher_id = te.teacher_id 
+        $totalQuery1 = "SELECT COUNT(*) AS total_count
+                        FROM section se 
+                        INNER JOIN grade_level gr ON gr.grade_level = se.grade_level_id 
+                        INNER JOIN student_section sec ON se.section_id = sec.section_id
+                        INNER JOIN teacher te ON te.teacher_id = sec.teacher_id
                         WHERE te.teacher_id = ?";
-        
-        if (!is_null($subject_id)) {
-            $totalQuery1 .= " AND cs.subject_id = ?";
-        }
 
         $stmtTotal = $conn->prepare($totalQuery1);
-        
-        if (is_null($subject_id)) {
-            $stmtTotal->bind_param('i', $teacher_id);
-        } else {
-            $stmtTotal->bind_param('ii', $teacher_id, $subject_id);
-        }
-
+        $stmtTotal->bind_param("i", $teacher_id);
         $stmtTotal->execute();
         $totalResult1 = $stmtTotal->get_result();
         $totalRow1 = $totalResult1->fetch_assoc();
@@ -924,9 +969,8 @@ if (isset($_POST['mysubject'])) {
     $length = $_POST["length"];
     $search = isset($_POST["search"]["value"]) ? $_POST["search"]["value"] : '';
     $teacher_id = $_SESSION["teacher_id"];
-    $subject_id = isset($_POST['subject']) ? $_POST['subject'] : null;
-
-    echo getsubjectList($draw, $start, $length, $search, $teacher_id, $subject_id);
+ 
+    echo getsubjectList($draw, $start, $length, $search, $teacher_id);
     exit();
 }
 
@@ -952,4 +996,54 @@ if (isset($_POST['bulkUpdate'])) {
         echo "No Students Selected";
     }
 }
-?>
+
+
+
+if (isset($_POST['absent'])) {
+    function getAbsentData($conn, $from_date, $to_date) {
+        $from_date = $conn->real_escape_string($from_date);
+        $to_date = $conn->real_escape_string($to_date);
+        $teacher_id = $_SESSION['teacher_id']; 
+
+
+        $query = " SELECT   st.student_id,
+                CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname,
+                COUNT(DISTINCT CASE WHEN a.status = 'ABSENT' THEN a.date END) AS absent_days
+            FROM student st
+            LEFT JOIN attendance a ON st.student_id = a.student_id
+                AND a.date BETWEEN ? AND ?  
+            INNER JOIN student_section ss ON st.student_id = ss.student_id
+            WHERE ss.teacher_id = ? 
+            GROUP BY st.student_id
+            ORDER BY absent_days DESC;
+        ";
+
+
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('sss', $from_date, $to_date, $teacher_id); 
+        
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        return json_encode([
+            "recordsTotal" => count($data),
+            "recordsFiltered" => count($data),
+            "data" => $data
+        ]);
+    }
+
+
+    $from_date = $_POST['from'];
+    $to_date = $_POST['to'];
+
+
+    echo getAbsentData($conn, $from_date, $to_date);
+    exit();
+}
+

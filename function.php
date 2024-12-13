@@ -220,6 +220,7 @@ if (isset($_POST['addsubject'])) {
  if (isset($_POST['addSection1'])) {
     $section = $_POST['section'];
     $school_year = $_POST['school_year'];
+    $teacher = $_POST['teacher'];
     $students = isset($_POST['student']) ? $_POST['student'] : []; 
 
  
@@ -228,12 +229,12 @@ if (isset($_POST['addsubject'])) {
         $conn->begin_transaction();
 
         try {
-            $query = "INSERT INTO student_section (section_id, school_year_id, student_id) VALUES (?, ?, ?)";
+            $query = "INSERT INTO student_section (section_id, teacher_id, school_year_id, student_id) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
 
             if ($stmt) {
                 foreach ($students as $student) {
-                    $stmt->bind_param("sss", $section, $school_year, $student);
+                    $stmt->bind_param("ssss", $section, $teacher, $school_year, $student);
 
                     if (!$stmt->execute()) {
                         throw new Exception($stmt->error);

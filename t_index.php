@@ -111,7 +111,7 @@ if (!isset($_SESSION['user_id'])) {
     <li class="nav-item ">
       <a href="student_list.php" class="nav-link ">
         <i class="nav-icon fas fa-book"></i>
-        <p>My Subject</p>
+        <p>Section</p>
       </a>
     </li>
   </ul>
@@ -143,11 +143,43 @@ if (!isset($_SESSION['user_id'])) {
     </div><!-- /.container-fluid -->
   </div>
   <!-- /.content-header -->
+  <div class="modal fade" id="generate_Student" tabindex="-1" role="dialog" aria-labelledby="studentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="studentModalLabel">Student List</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <label>From</label>
+          <input type="date" class="form-control w-25 me-3" name="from" id="from_date">
+          <label>To</label>
+          <input type="date" class="form-control w-25" name="to" id="to_date">
+        </div>
+        <div class="table-responsive">
+          <table id="Absent_generate" class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Number of Absent</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Main content -->
   <section class="content">
   <div class="card">
     <div class="card-body">
+      <button class="btn btn-primary btn-sm float-sm-right" data-toggle="modal" data-target="#generate_Student" >Generate Absent Students</button>
     <div class="table-responsive">
                   <table id="attendance" class="table table-bordered table-striped">
                     <thead>

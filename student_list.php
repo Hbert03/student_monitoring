@@ -110,7 +110,7 @@ if (!isset($_SESSION['user_id'])) {
     <li class="nav-item ">
       <a href="#" class="nav-link active">
         <i class="nav-icon fas fa-book"></i>
-        <p>My Subject</p>
+        <p>Section</p>
       </a>
     </li>
   </ul>
@@ -131,7 +131,7 @@ if (!isset($_SESSION['user_id'])) {
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Attendance</h1>
+          <h1 class="m-0">My Section</h1>
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -146,9 +146,9 @@ if (!isset($_SESSION['user_id'])) {
   <section class="content">
   <div class="card">
     <div class="card-body">
-    <select class="form-control w-25 sort_subject"></select>
+    <!-- <select class="form-control w-25 sort_subject"></select> -->
     <div class="table-responsive">
-                  <table id="mysubject" class="table table-bordered table-striped">
+                  <table id="mySection" class="table table-bordered table-striped">
                     <thead>
                       <tr>
                         <th>Name</th>
