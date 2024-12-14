@@ -151,8 +151,9 @@ if (!isset($_SESSION['user_id'])) {
                   <table id="mySection" class="table table-bordered table-striped">
                     <thead>
                       <tr>
-                        <th>Name</th>
+                        <th>Student Name</th>
                         <th>Grade Level</th>
+                        <th>Section</th>
                       </tr>
                     </thead>
                 <tbody></tbody>

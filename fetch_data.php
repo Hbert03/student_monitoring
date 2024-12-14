@@ -900,10 +900,11 @@ if (isset($_POST['mysubject'])) {
         }
 
         // Main query with teacher and subject filters
-        $query1 = "SELECT se.section_name, gr.grade_level_name
+        $query1 = "SELECT se.section_name, gr.grade_level_name, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname
                    FROM section se 
                    INNER JOIN grade_level gr ON gr.grade_level = se.grade_level_id 
                    INNER JOIN student_section sec ON se.section_id = sec.section_id
+                   INNER JOIN student st ON st.student_id = sec.student_id
                    INNER JOIN teacher te ON te.teacher_id = sec.teacher_id
                    WHERE te.teacher_id = ?";
 
@@ -936,11 +937,12 @@ if (isset($_POST['mysubject'])) {
 
         // Count query for total records
         $totalQuery1 = "SELECT COUNT(*) AS total_count
-                        FROM section se 
-                        INNER JOIN grade_level gr ON gr.grade_level = se.grade_level_id 
-                        INNER JOIN student_section sec ON se.section_id = sec.section_id
-                        INNER JOIN teacher te ON te.teacher_id = sec.teacher_id
-                        WHERE te.teacher_id = ?";
+                   FROM section se 
+                   INNER JOIN grade_level gr ON gr.grade_level = se.grade_level_id 
+                   INNER JOIN student_section sec ON se.section_id = sec.section_id
+                   INNER JOIN student st ON st.student_id = sec.student_id
+                   INNER JOIN teacher te ON te.teacher_id = sec.teacher_id
+                   WHERE te.teacher_id = ?";
 
         $stmtTotal = $conn->prepare($totalQuery1);
         $stmtTotal->bind_param("i", $teacher_id);

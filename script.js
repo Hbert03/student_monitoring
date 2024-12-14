@@ -1905,8 +1905,10 @@ $(document).ready(function() {
             }
         },
         columns: [
-            { "data": "section_name" },
+            { "data": "fullname" },
             { "data": "grade_level_name" },
+            { "data": "section_name" }
+          
         ],
         drawCallback: function(){
             deletedstudent();
