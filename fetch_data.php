@@ -750,7 +750,7 @@ if (isset($_POST['attendance'])) {
             $totalQuery .= ")
             SELECT COUNT(*) AS total_count
             FROM RankedAttendance
-            WHERE row_num = 4";
+            WHERE row_num = 1";
 
 
                 $stmtTotal = $conn->prepare($totalQuery);
@@ -1008,17 +1008,34 @@ if (isset($_POST['absent'])) {
         $teacher_id = $_SESSION['teacher_id']; 
 
 
-        $query = " SELECT   st.student_id,
-                CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname,
-                COUNT(DISTINCT CASE WHEN a.status = 'ABSENT' THEN a.date END) AS absent_days
-            FROM student st
-            LEFT JOIN attendance a ON st.student_id = a.student_id
-                AND a.date BETWEEN ? AND ?  
-            INNER JOIN student_section ss ON st.student_id = ss.student_id
-            WHERE ss.teacher_id = ? 
-            GROUP BY st.student_id
-            ORDER BY absent_days DESC;
-        ";
+        $query = "SELECT 
+    st.student_id, 
+    CONCAT(
+        st.student_firstname, 
+        ' ', 
+        COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), 
+        '. ', 
+        st.student_lastname
+    ) AS fullname, 
+    COUNT(DISTINCT CASE WHEN a.status = 'ABSENT' THEN a.date END) AS absent_days, 
+    GROUP_CONCAT(DISTINCT CASE WHEN a.status = 'ABSENT' THEN a.date END ORDER BY a.date ASC) AS absent_dates
+            FROM 
+                student st
+            LEFT JOIN 
+                attendance a 
+            ON 
+                st.student_id = a.student_id 
+                AND a.date BETWEEN ? AND ?
+            INNER JOIN 
+                student_section ss 
+            ON 
+                st.student_id = ss.student_id 
+            WHERE 
+                ss.teacher_id = ?
+            GROUP BY 
+                st.student_id 
+            ORDER BY 
+                absent_days DESC";
 
 
         $stmt = $conn->prepare($query);

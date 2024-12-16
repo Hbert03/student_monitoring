@@ -10,7 +10,9 @@ function fetchEnrolledData() {
     }
 
     $data = array('labels' => array(), 'values' => array());
-    $currentYearLabel = date('Y'); 
+    $currentYear = date('Y');
+    $nextYear = $currentYear + 1;
+    $currentYearLabel = $currentYear . '-' . $nextYear;
     $gradeLevels = [7, 8, 9, 10, 11, 12];
     $gradeNames = ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 
@@ -44,7 +46,9 @@ function fetchAbsentData() {
     }
 
     $data = array('labels' => array(), 'values' => array());
-    $currentYearLabel = date('Y'); 
+    $currentYear = date('Y');
+    $nextYear = $currentYear + 1;
+    $currentYearLabel = $currentYear . '-' . $nextYear;
     $gradeLevels = [ 7, 8, 9, 10, 11, 12];
     $gradeNames = ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 

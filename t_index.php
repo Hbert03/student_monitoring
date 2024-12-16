@@ -164,6 +164,7 @@ if (!isset($_SESSION['user_id'])) {
             <thead>
               <tr>
                 <th>Student</th>
+                <th>Date</th>
                 <th>Number of Absent</th>
               </tr>
             </thead>

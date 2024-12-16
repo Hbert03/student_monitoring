@@ -1956,7 +1956,24 @@ $(document).ready(function() {
         },
         columns: [
             { "data": "fullname" },
-            { "data": "absent_days" }
+            { 
+                "data": "absent_dates",
+                "render": function(data, type, row) {
+                    if (data) {
+                        return data.split(',').map(function(date) {
+                            var d = new Date(date.trim());
+                            return d.toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            });
+                        }).join(', ');
+                    }
+                    return '';
+                }
+            },
+            { "data": "absent_days" },
+    
         ]
     });
 
