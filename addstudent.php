@@ -31,7 +31,14 @@ include ('header.php');
         
         <div class="card mb-3">
           <div class="card-header">
+            <div class="row">
+              <div class="col">
             <h4>Student's Information</h4>
+            </div>
+            <div class="col">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#bulkenrollment">Bulk Enrollment</button>
+            </div>
+            </div>
           </div>
           <div class="card-body">
             <div class="form-row">
@@ -115,8 +122,8 @@ include ('header.php');
                 <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" placeholder="Mobile Number" required>
               </div>
               <div class="form-group col-md-6">
-                <label for="email">Email (Optional)</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
               </div>
             </div>
             <div class="form-row">
@@ -143,5 +150,26 @@ include ('header.php');
 </section>
 </div>
 <!-- /.content-wrapper -->
-
+<div class="modal fade" id="bulkenrollment" tabindex="-1" role="dialog" aria-labelledby="studentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="studentModalLabel">Bulk Enrollment</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <form id="bulkUploadForm" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="csvFile">Upload CSV File</label>
+        <input type="file" class="form-control" id="bulkFileInput" name="csvFile" accept=".csv" required>
+      </div>
+      <button type="submit" id="bulkUploadButton" class="btn btn-primary">Upload and Enroll</button>
+    </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <?php include ('footer.php'); ?>

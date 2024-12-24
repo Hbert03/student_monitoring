@@ -109,11 +109,18 @@ if (!isset($_SESSION['user_id'])) {
       </a>
     </li>
     <li class="nav-item ">
+      <a href="addclass_section.php" class="nav-link ">
+        <i class="nav-icon fas fa-book"></i>
+        <p>Add Section</p>
+      </a>
+    </li>
+    <li class="nav-item ">
       <a href="student_list.php" class="nav-link ">
         <i class="nav-icon fas fa-book"></i>
         <p>Section</p>
       </a>
     </li>
+   
   </ul>
 </nav>
 
@@ -187,7 +194,9 @@ if (!isset($_SESSION['user_id'])) {
                       <tr>
                         <th>Date</th>
                         <th>Student</th>
-                        <th colspan="2">Status</th>
+                        <th colspan="2">Morning Status</th>
+                        <th colspan="2">Afternoon Status</th>
+                        <!-- <th colspan="2">Status</th> -->
                       </tr>
                     </thead>
                 <tbody></tbody>
@@ -197,5 +206,8 @@ if (!isset($_SESSION['user_id'])) {
 </section>
 </div>
 <!-- /.content-wrapper -->
+
+
+
 
 <?php include ('footer.php'); ?>

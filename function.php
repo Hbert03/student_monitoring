@@ -1,5 +1,75 @@
 <?php
+session_start();
 include ('database.php');
+if (isset($_POST['bulkEnrollment'])) {  
+    if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['file']['tmp_name'];
+        $fileData = array_map('str_getcsv', file($fileTmpPath)); 
+        $totalEnrolled = 0;
+        $results = []; 
+
+        foreach ($fileData as $index => $row) {
+            if ($index === 0) continue; 
+            
+          
+            list($firstname, $middlename, $lastname, $studentMobile, $studentAddress, $status, $gender, $gradelevel, $parentName, $parentType, $parentMobile, $email, $address) = $row;
+
+            $query = "SELECT student_id FROM student WHERE student_firstname = ? AND student_middlename = ? AND student_lastname = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("sss", $firstname, $middlename, $lastname);
+            $stmt->execute();
+            $stmt->store_result();
+
+            if ($stmt->num_rows > 0) {
+                $results[] = ['name' => "$firstname $lastname", 'status' => 'exists'];
+                continue; 
+            }
+
+            $stmt->close(); 
+            $query = "INSERT INTO parent (parent_name, parent_type, parent_mobile, email, parent_address) VALUES (?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("sssss", $parentName, $parentType, $parentMobile, $email, $address);
+            if (!$stmt->execute()) {
+                $results[] = ['name' => "$firstname $lastname", 'status' => 'parent_insertion_failed'];
+                continue;
+            }
+            $parent_id = $stmt->insert_id;
+
+            $stmt->close();
+
+            $query = "INSERT INTO student (student_firstname, student_middlename, student_lastname, student_mobile, student_address, student_status, gender, parent_id, grade_level_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("ssssssiii", $firstname, $middlename, $lastname, $studentMobile, $studentAddress, $status, $gender, $parent_id, $gradelevel);
+            if (!$stmt->execute()) {
+                $results[] = ['name' => "$firstname $lastname", 'status' => 'student_insertion_failed'];
+                continue;
+            }
+            $student_id = $stmt->insert_id;
+
+            $stmt->close();
+
+            $qrCodeData = json_encode(['id' => $student_id, 'name' => "$firstname $middlename $lastname"]);
+            $qrCodeUrl = "qrcodes/{$student_id}.png";
+            file_put_contents($qrCodeUrl, generateQRCode($qrCodeData)); 
+            $results[] = ['name' => "$firstname $lastname", 'status' => 'enrolled', 'qrCode' => $qrCodeUrl];
+            $totalEnrolled++;
+        }
+
+        echo json_encode(['success' => true, 'totalEnrolled' => $totalEnrolled, 'results' => $results]);
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Failed to read the file or no file provided']);
+    }
+}
+
+
+function generateQRCode($data) {
+    include 'phpqrcode/qrlib.php'; 
+    ob_start();
+    QRcode::png($data);
+    $imageString = ob_get_clean();
+    return $imageString;
+}
+
 
 if (isset($_POST['save'])) {
     $parentName = $_POST['parentname'];
@@ -220,7 +290,7 @@ if (isset($_POST['addsubject'])) {
  if (isset($_POST['addSection1'])) {
     $section = $_POST['section'];
     $school_year = $_POST['school_year'];
-    $teacher = $_POST['teacher'];
+    $teacher = $_SESSION['teacher_id'];
     $students = isset($_POST['student']) ? $_POST['student'] : []; 
 
  

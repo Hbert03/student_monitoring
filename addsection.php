@@ -92,49 +92,6 @@ include ('header.php');
       </form>
   </div>
 </section> -->
-<div class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0">Add Student Section</h1>
-            </div><!-- /.col -->
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right"></ol>
-            </div><!-- /.col -->
-        </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
-</div>
-<!-- /.content-header -->
-<section class="content">
-    <div class="card">
-        <div class="card-body">
-            <form id="addstudentSectionForm">
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label for="fullname">Section</label>
-                        <select class="form-control section" name="section" required></select>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="address">School year</label>
-                        <select class="form-control school_year" name="school_year" required></select>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="address">Teacher</label>
-                        <select class="form-control teacher" name="teacher" required></select>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="address">Student</label>
-                        <select class="form-control student" name="student[]" multiple="multiple" required></select>
-                    </div>
-                    </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary btn5">Save</button>
-                </div>
-            </form>
-            </div>
-        </div>
-</section>
-
 </div>
 
 

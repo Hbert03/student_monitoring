@@ -17,6 +17,81 @@ function confirmLogout() {
 }
 
 
+$(document).ready(function () {
+    $("#bulkUploadButton").on("click", function (event) {
+        event.preventDefault();
+        var fileInput = $("#bulkFileInput")[0];
+        if (!fileInput.files.length) {
+            Swal.fire({
+                icon: "warning",
+                title: "No File Selected",
+                text: "Please upload a CSV file to proceed.",
+            });
+            return;
+        }
+        Swal.fire({
+            title: "Processing Bulk Enrollment",
+            text: "Please wait while we process the student data...",
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
+
+        var formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        formData.append("bulkEnrollment", true);
+
+        $.ajax({
+            url: "function.php", 
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Failed to parse server response. Please try again.",
+                    });
+                    return;
+                }
+
+                if (response.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Bulk Enrollment Completed",
+                        text: `students were successfully enrolled.`,
+                        showConfirmButton: true,
+                    });
+
+                    $("#bulkFileInput").val("");
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Bulk Enrollment Failed",
+                        text: response.error || "An error occurred during enrollment.",
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "AJAX Error",
+                    text: error,
+                });
+            },
+        });
+    });
+});
+
+
+
+
 $(document).ready(function() {
   $("button.btn1").on("click", function(event) {
       event.preventDefault();
@@ -791,26 +866,22 @@ $(document).ready(function () {
             }
         ],
         initComplete: function () {
-            // Add a "Check All" checkbox in the header
             $('#student thead tr').prepend(`
                 <th>
                     <input type="checkbox" id="check-all">
                 </th>
             `);
     
-            // Add a "Check All" checkbox for the body
             $('#student tbody tr').each(function () {
                 $(this).prepend('<td></td>');
             });
     
-            // Handle Check All functionality
             $('#check-all').on('click', function () {
                 var isChecked = $(this).is(':checked');
                 $('.student-checkbox').prop('checked', isChecked);
             });
         },
         drawCallback: function () {
-             // Sync Check All checkbox state with row checkboxes
         const totalCheckboxes = $('.student-checkbox').length;
         const checkedCheckboxes = $('.student-checkbox:checked').length;
         $('#check-all').prop('checked', totalCheckboxes > 0 && totalCheckboxes === checkedCheckboxes);
@@ -1702,7 +1773,10 @@ $('#attendance').DataTable({
             }
         },
         { "data": "fullname" },
-        { "data": "status" }
+        { "data": "morning_in" },
+        { "data": "morning_out" },
+        { "data": "afternoon_in" },
+        { "data": "afternoon_out" }
     ],
 });
 
@@ -1981,4 +2055,45 @@ $(document).ready(function() {
     $('#from_date, #to_date').on('change', function() {
         table.ajax.reload();
     });
+});
+
+
+
+
+
+
+
+$(document).ready(function () {
+    setInterval(function () {
+        var now = new Date();
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+
+        if (hours === 22 && minutes ===6  && seconds === 0) {
+            console.log("Absent Student....");
+            absent(hours); 
+        }
+    }, 1000);
+
+    function absent(hours) {
+  
+        let task;
+        if (hours === 22) {
+            task = 'markAbsent'; 
+        }
+
+
+        $.ajax({
+            url: 'absent_funct.php',  
+            method: 'GET',
+            data: { task: task },
+            success: function (response) {
+                console.log('Response from server:', response);
+            },
+            error: function () {
+                console.log('Error in AJAX request');
+            }
+        });
+    }
 });

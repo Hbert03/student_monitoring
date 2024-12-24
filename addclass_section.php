@@ -62,8 +62,9 @@ if (!isset($_SESSION['user_id'])) {
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link active">Home</a>
       </li>
+    
     </ul>
   <!-- Right navbar links -->
   <ul class="navbar-nav ml-auto">
@@ -102,25 +103,26 @@ if (!isset($_SESSION['user_id'])) {
     <nav class="mt-2" id="sidebarNav">
   <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
     <li class="nav-item ">
-      <a href="t_index.php" class="nav-link">
+      <a href="t_index.php" class="nav-link ">
         <i class="nav-icon fas fa-tachometer-alt"></i>
         <p>Attendance</p>
       </a>
     </li>
     <li class="nav-item ">
-      <a href="addclass_section.php" class="nav-link ">
+      <a href="addclass_section.php" class="nav-link active">
         <i class="nav-icon fas fa-book"></i>
         <p>Add Section</p>
       </a>
     </li>
     <li class="nav-item ">
-      <a href="#" class="nav-link active">
+      <a href="student_list.php" class="nav-link ">
         <i class="nav-icon fas fa-book"></i>
         <p>Section</p>
       </a>
     </li>
   </ul>
 </nav>
+
 
     <!-- /.sidebar-menu -->
   </div>
@@ -137,7 +139,7 @@ if (!isset($_SESSION['user_id'])) {
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">My Section</h1>
+          <h1 class="m-0">Attendance</h1>
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -147,27 +149,37 @@ if (!isset($_SESSION['user_id'])) {
     </div><!-- /.container-fluid -->
   </div>
   <!-- /.content-header -->
+ 
 
   <!-- Main content -->
   <section class="content">
-  <div class="card">
-    <div class="card-body">
-    <!-- <select class="form-control w-25 sort_subject"></select> -->
-    <div class="table-responsive">
-                  <table id="mySection" class="table table-bordered table-striped">
-                    <thead>
-                      <tr>
-                        <th>Student Name</th>
-                        <th>Grade Level</th>
-                        <th>Section</th>
-                      </tr>
-                    </thead>
-                <tbody></tbody>
-             </table>
+    <div class="card">
+        <div class="card-body">
+            <form id="addstudentSectionForm">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="fullname">Section</label>
+                        <select class="form-control section" name="section" required></select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="address">School year</label>
+                        <select class="form-control school_year" name="school_year" required></select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="address">Student</label>
+                        <select class="form-control student" name="student[]" multiple="multiple" required></select>
+                    </div>
+                    </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn5">Save</button>
+                </div>
+            </form>
+            </div>
         </div>
-  </div>
 </section>
 </div>
 <!-- /.content-wrapper -->
+
+
 
 <?php include ('footer.php'); ?>

@@ -660,45 +660,46 @@ if (isset($_POST['attendance'])) {
         }
 
         $query = "WITH RankedAttendance AS (
-            SELECT 
-                a.student_id,
-                CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname,
-                CASE
-                    WHEN TIME(a.date) BETWEEN '07:00:00' AND '08:00:00' THEN 'IN'
-                    WHEN TIME(a.date) > '08:00:00' AND TIME(a.date) < '12:00:00' THEN 'LATE'
-                    WHEN TIME(a.date) BETWEEN '12:00:00' AND '12:59:59' THEN 'OUT'
-                    WHEN TIME(a.date) BETWEEN '13:00:00' AND '14:00:00' THEN 'IN'
-                    WHEN TIME(a.date) > '14:00:00' AND TIME(a.date) < '16:00:00' THEN 'LATE'
-                    WHEN TIME(a.date) BETWEEN '16:00:00' AND '18:00:00' THEN 'OUT'
-                    ELSE 'INVALID'
-                END AS status,
-                a.date,
-                ROW_NUMBER() OVER (PARTITION BY a.student_id, 
-                   CASE 
-                       WHEN TIME(a.date) BETWEEN '07:00:00' AND '08:00:00' THEN 'morning_in'
-                       WHEN TIME(a.date) BETWEEN '12:00:00' AND '12:59:59' THEN 'morning_out'
-                       WHEN TIME(a.date) BETWEEN '13:00:00' AND '14:00:00' THEN 'afternoon_in'
-                       WHEN TIME(a.date) BETWEEN '16:00:00' AND '18:00:00' THEN 'afternoon_out'
-                   END
-                   ORDER BY a.date ASC) AS row_num
-            FROM attendance a
-            INNER JOIN student st ON a.student_id = st.student_id
-            INNER JOIN student_section ss ON a.student_id = ss.student_id
-            INNER JOIN teacher te ON te.teacher_id = ss.teacher_id
-            WHERE te.teacher_id = ? 
-            AND DATE(a.date) = CURDATE()";
+    SELECT 
+        a.student_id,
+        DATE(a.date) AS date,
+        CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname,
+        MAX(CASE 
+            WHEN TIME(a.date) BETWEEN '07:00:00' AND '12:00:00' AND a.status = 'IN' THEN a.status
+            ELSE NULL
+        END) AS morning_in,
+        MAX(CASE 
+            WHEN TIME(a.date) BETWEEN '07:00:00' AND '12:00:00' AND a.status = 'OUT' THEN a.status
+            ELSE NULL
+        END) AS morning_out,
+        MAX(CASE 
+            WHEN TIME(a.date) BETWEEN '13:00:00' AND '18:00:00' AND a.status = 'IN' THEN a.status
+            ELSE NULL
+        END) AS afternoon_in,
+        MAX(CASE 
+            WHEN TIME(a.date) BETWEEN '13:00:00' AND '18:00:00' AND a.status = 'OUT' THEN a.status
+            ELSE NULL
+        END) AS afternoon_out
+    FROM attendance a
+    INNER JOIN student st ON a.student_id = st.student_id
+    INNER JOIN student_section ss ON a.student_id = ss.student_id
+    INNER JOIN teacher te ON te.teacher_id = ss.teacher_id
+    WHERE te.teacher_id = ? 
+    AND DATE(a.date) = CURDATE()
+    GROUP BY a.student_id, DATE(a.date)";
+            
+
+    $query .= ") 
+           SELECT student_id, fullname, date, morning_in, morning_out, afternoon_in, afternoon_out
+            FROM RankedAttendance
+            ORDER BY date ASC
+            LIMIT ?, ?";
+
 
         if (!empty($search)) {
             $query .= " AND (st.student_firstname LIKE ? OR st.student_lastname LIKE ?)";
         }
 
-        $query .= ") 
-                   SELECT student_id, fullname, status, date
-                    FROM RankedAttendance
-                    WHERE row_num = 1
-                    AND status IN ('IN', 'LATE', 'OUT')
-                    ORDER BY date ASC
-                    LIMIT ?, ?";
 
         $stmt = $conn->prepare($query);
         if (!$stmt) {
@@ -716,41 +717,42 @@ if (isset($_POST['attendance'])) {
         $result = $stmt->get_result();
 
         $totalQuery = "WITH RankedAttendance AS (
-            SELECT 
-                a.student_id,
-                CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname,
-                CASE
-                    WHEN TIME(a.date) BETWEEN '07:00:00' AND '08:00:00' THEN 'IN'
-                    WHEN TIME(a.date) > '08:00:00' AND TIME(a.date) < '12:00:00' THEN 'LATE'
-                    WHEN TIME(a.date) BETWEEN '12:00:00' AND '12:59:59' THEN 'OUT'
-                    WHEN TIME(a.date) BETWEEN '13:00:00' AND '14:00:00' THEN 'IN'
-                    WHEN TIME(a.date) > '14:00:00' AND TIME(a.date) < '16:00:00' THEN 'LATE'
-                    WHEN TIME(a.date) BETWEEN '16:00:00' AND '18:00:00' THEN 'OUT'
-                    ELSE 'INVALID'
-                END AS status,
-                ROW_NUMBER() OVER (PARTITION BY a.student_id, 
-                   CASE 
-                       WHEN TIME(a.date) BETWEEN '07:00:00' AND '08:00:00' THEN 'morning_in'
-                       WHEN TIME(a.date) BETWEEN '12:00:00' AND '12:59:59' THEN 'morning_out'
-                       WHEN TIME(a.date) BETWEEN '13:00:00' AND '14:00:00' THEN 'afternoon_in'
-                       WHEN TIME(a.date) BETWEEN '16:00:00' AND '18:00:00' THEN 'afternoon_out'
-                   END
-                   ORDER BY a.date ASC) AS row_num
-            FROM attendance a
-            INNER JOIN student st ON a.student_id = st.student_id
-            INNER JOIN student_section ss ON a.student_id = ss.student_id
-            INNER JOIN teacher te ON te.teacher_id = ss.teacher_id
-            WHERE te.teacher_id = ? 
-            AND DATE(a.date) = CURDATE()";
+    SELECT 
+        a.student_id,
+        DATE(a.date) AS date,
+        CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname,
+        MAX(CASE 
+            WHEN TIME(a.date) BETWEEN '07:00:00' AND '12:00:00' AND a.status = 'IN' THEN a.status
+            ELSE NULL
+        END) AS morning_in,
+        MAX(CASE 
+            WHEN TIME(a.date) BETWEEN '07:00:00' AND '12:00:00' AND a.status = 'OUT' THEN a.status
+            ELSE NULL
+        END) AS morning_out,
+        MAX(CASE 
+            WHEN TIME(a.date) BETWEEN '13:00:00' AND '18:00:00' AND a.status = 'IN' THEN a.status
+            ELSE NULL
+        END) AS afternoon_in,
+        MAX(CASE 
+            WHEN TIME(a.date) BETWEEN '13:00:00' AND '18:00:00' AND a.status = 'OUT' THEN a.status
+            ELSE NULL
+        END) AS afternoon_out
+    FROM attendance a
+    INNER JOIN student st ON a.student_id = st.student_id
+    INNER JOIN student_section ss ON a.student_id = ss.student_id
+    INNER JOIN teacher te ON te.teacher_id = ss.teacher_id
+    WHERE te.teacher_id = ? 
+    AND DATE(a.date) = CURDATE()
+    GROUP BY a.student_id, DATE(a.date)";
 
             if (!empty($search)) {
                 $totalQuery .= " AND (st.student_firstname LIKE ? OR st.student_lastname LIKE ?)";
             }
 
             $totalQuery .= ")
-            SELECT COUNT(*) AS total_count
-            FROM RankedAttendance
-            WHERE row_num = 1";
+
+    SELECT COUNT(*) AS total_count
+    FROM RankedAttendance";
 
 
                 $stmtTotal = $conn->prepare($totalQuery);
@@ -900,29 +902,25 @@ if (isset($_POST['mysubject'])) {
         }
 
         // Main query with teacher and subject filters
-        $query1 = "SELECT se.section_name, gr.grade_level_name, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname
-                   FROM section se 
-                   INNER JOIN grade_level gr ON gr.grade_level = se.grade_level_id 
-                   INNER JOIN student_section sec ON se.section_id = sec.section_id
-                   INNER JOIN student st ON st.student_id = sec.student_id
-                   INNER JOIN teacher te ON te.teacher_id = sec.teacher_id
+        $query1 = "SELECT se.section_name, gl.grade_level_name, CONCAT(st.student_firstname, ' ', COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), '. ', st.student_lastname) AS fullname
+        FROM student_section ss INNER JOIN section se ON ss.section_id = se.section_id INNER JOIN student st ON 
+        st.student_id = ss.student_id INNER JOIN grade_level gl ON st.grade_level_id = gl.grade_level INNER JOIN teacher te ON te.teacher_id = ss.teacher_id
                    WHERE te.teacher_id = ?";
 
-        // Add search filter
         if (!empty($search)) {
-            $query1 .= " AND (se.section_name LIKE ?)";
-        }
-
+            $query1 .= " AND (st.student_firstname LIKE ? OR 
+                            se.section_name LIKE ? OR 
+                            gl.grade_level_name LIKE ?)";
+}
         $query1 .= " ORDER BY $orderBy $orderDir LIMIT ?, ?";
         $stmt = $conn->prepare($query1);
 
         if (!empty($search)) {
-            $likeSearch = '%' . $search . '%';
             $stmt = $conn->prepare($query1);
             if (!$stmt) {
                 die("Prepare failed: " . $conn->error);
             }
-            $stmt->bind_param("siii", $likeSearch, $teacher_id, $start, $length);
+            $stmt->bind_param("sssiii", $search, $search, $search, $teacher_id, $start, $length);
         } else {
             $stmt = $conn->prepare($query1);
             if (!$stmt) {
@@ -931,17 +929,15 @@ if (isset($_POST['mysubject'])) {
             $stmt->bind_param("iii", $teacher_id, $start, $length);
         }
         
+        
 
         $stmt->execute();
         $result1 = $stmt->get_result();
 
         // Count query for total records
         $totalQuery1 = "SELECT COUNT(*) AS total_count
-                   FROM section se 
-                   INNER JOIN grade_level gr ON gr.grade_level = se.grade_level_id 
-                   INNER JOIN student_section sec ON se.section_id = sec.section_id
-                   INNER JOIN student st ON st.student_id = sec.student_id
-                   INNER JOIN teacher te ON te.teacher_id = sec.teacher_id
+                    FROM student_section ss INNER JOIN section se ON ss.section_id = se.section_id INNER JOIN student st ON 
+        st.student_id = ss.student_id INNER JOIN grade_level gl ON st.grade_level_id = gl.grade_level INNER JOIN teacher te ON te.teacher_id = ss.teacher_id
                    WHERE te.teacher_id = ?";
 
         $stmtTotal = $conn->prepare($totalQuery1);
