@@ -100,15 +100,20 @@ include ('header.php');
       <div class="modal-body">
         <button class="btn btn-primary float-right" id="bulk-update-btn">Update Students Grade Level</button>
         <!-- <select id="sort_grade_level" class="form-control w-25 sort_grade_level"></select> -->
+        <button id="download-selected" class="btn btn-success mb-2">Download Selected</button>
+
         <div class="table-responsive">
           <table id="student" class="table table-bordered table-striped">
             <thead>
               <tr>
+              <th >Select All
+              <input type="checkbox" id="check-all">
+              </th>
                 <th>Name</th>
                 <th>Mobile Number</th>
                 <th>Address</th>
                 <th>Grade Level</th>
-                <th>QR CODE</th>
+                <th>QR CODE </th>
                 <th colspan="2">Action</th>
               </tr>
             </thead>

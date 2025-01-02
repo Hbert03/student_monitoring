@@ -60,20 +60,19 @@ if (isset($_POST['fetch'])) {
             $studentName = $row['fullname'];
             $qrFileName = 'qrcodes/' . $row['student_firstname'] . '.png';  
             
-           
             if (!file_exists($qrFileName)) {
                 $qrText = "Student ID: " . $studentId . "\nName: " . $studentName;
                 QRcode::png($qrText, $qrFileName);
             }
-
+        
             $row['qrcode'] = '<div style="text-align: center;">
+                                <input type="checkbox" class="qrcode-checkbox" data-id="' . $studentId . '" data-filename="' . $qrFileName . '">
                                 <img src="' . $qrFileName . '" style="max-width: 100px; display: block; margin: 0 auto;" alt="QR Code">
                                 <a href="' . $qrFileName . '" download class="btn btn-primary btn-sm mt-1">Download QR</a>
                               </div>';
-
             $data[] = $row;
         }
-
+        
         $output = array(
             "draw" => intval($draw),
             "recordsTotal" => intval($totalRecords1),

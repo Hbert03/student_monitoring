@@ -812,7 +812,6 @@ $(document).ready(function() {
 
 
 $(document).ready(function () {
-    // Initialize DataTable
     var table = $('#student').DataTable({
         dom: 'lBfrtip',
         buttons: ['copy', 'excel'],
@@ -837,7 +836,7 @@ $(document).ready(function () {
                 "orderable": false,
                 "searchable": false,
                 "render": function (data, type, row) {
-                    return `<input type="checkbox" class="student-checkbox" value="${row.student_id}">`;
+                    return  ` <input type="checkbox" class="student-checkbox" value="${row.student_id}">`;
                 }
             },
             { "data": "fullname" },
@@ -866,11 +865,11 @@ $(document).ready(function () {
             }
         ],
         initComplete: function () {
-            $('#student thead tr').prepend(`
-                <th>
-                    <input type="checkbox" id="check-all">
-                </th>
-            `);
+            // $('#student thead tr').prepend( '<label style="margin-right:30px">All</label>'+`
+            //     <th class="text-center">
+            //         <input type="checkbox" id="check-all">
+            //     </th>
+            // `);
     
             $('#student tbody tr').each(function () {
                 $(this).prepend('<td></td>');
@@ -890,6 +889,7 @@ $(document).ready(function () {
             editstudent();
         }
     });
+
 
 
 
@@ -2097,3 +2097,32 @@ $(document).ready(function () {
         });
     }
 });
+
+
+document.getElementById('download-selected').addEventListener('click', function () {
+    const selectedCheckboxes = document.querySelectorAll('.qrcode-checkbox:checked');
+    if (selectedCheckboxes.length === 0) {
+        toastr.error('Please student at least one QR code.');
+        return;
+    }
+
+    selectedCheckboxes.forEach(checkbox => {
+        const fileName = checkbox.getAttribute('data-filename');
+        const link = document.createElement('a');
+        link.href = fileName;
+        link.download = fileName.split('/').pop();
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+});
+
+
+
+document.getElementById('check-all').addEventListener('change', function () {
+    const checkboxes = document.querySelectorAll('.qrcode-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+});
+

@@ -19,7 +19,7 @@ function fetchEnrolledData() {
     foreach ($gradeLevels as $index => $gradeLevelId) {
         $sql = "SELECT COUNT(*) as total 
                 FROM student 
-                WHERE YEAR(date) = YEAR(CURDATE()) AND grade_level_id = ?";
+                WHERE grade_level_id = ?";
         
         if ($stmt = $conn->prepare($sql)) {
             $stmt->bind_param("i", $gradeLevelId);
