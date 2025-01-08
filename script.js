@@ -2005,8 +2005,8 @@ toastr.options = {
 }
 
 
-$(document).ready(function() {
 
+$(document).ready(function () {
     var table = $('#Absent_generate').DataTable({
         dom: 'lBfrtip',
         buttons: [
@@ -2019,12 +2019,12 @@ $(document).ready(function() {
         ajax: {
             url: 'fetch_data.php',
             type: 'POST',
-            data: function(d) {
+            data: function (d) {
                 d.absent = true;
                 d.from = $('#from_date').val();
                 d.to = $('#to_date').val();
             },
-            error: function(xhr, error, thrown) {
+            error: function (xhr, error, thrown) {
                 console.log('Ajax Failed: ' + thrown);
             }
         },
@@ -2032,33 +2032,24 @@ $(document).ready(function() {
             { "data": "fullname" },
             { 
                 "data": "absent_dates",
-                "render": function(data, type, row) {
+                "render": function (data, type, row) {
                     if (data) {
-                        return data.split(',').map(function(date) {
-                            var d = new Date(date.trim());
-                            return d.toLocaleDateString('en-US', { 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric' 
-                            });
-                        }).join(', ');
+                        return data.split(',').map(function (entry) {
+                            return entry.trim();
+                        }).join('<br>'); 
                     }
+                    
                     return '';
                 }
             },
             { "data": "absent_days" },
-    
         ]
     });
 
-    // Handle date range change
-    $('#from_date, #to_date').on('change', function() {
+    $('#from_date, #to_date').on('change', function () {
         table.ajax.reload();
     });
 });
-
-
-
 
 
 
@@ -2069,24 +2060,22 @@ $(document).ready(function () {
         var hours = now.getHours();
         var minutes = now.getMinutes();
         var seconds = now.getSeconds();
-
-        if (hours === 22 && minutes ===6  && seconds === 0) {
-            console.log("Absent Student....");
-            absent(hours); 
+        if ((hours === 12 && minutes === 0 && seconds === 0) || (hours === 17 && minutes === 0 && seconds === 0)) {
+            console.log("Checking absent students...");
+            markAbsent(hours);
         }
     }, 1000);
 
-    function absent(hours) {
-  
+    function markAbsent(hours) {
         let task;
-        if (hours === 22) {
-            task = 'markAbsent'; 
+        if (hours === 12) {
+            task = 'markAbsentMorning'; 
+        } else if (hours === 17) {
+            task = 'markAbsentAfternoon'; 
         }
 
-
         $.ajax({
-            url: 'absent_funct.php',  
-            method: 'GET',
+            url: 'absent_funct.php', 
             data: { task: task },
             success: function (response) {
                 console.log('Response from server:', response);
@@ -2097,6 +2086,7 @@ $(document).ready(function () {
         });
     }
 });
+
 
 
 document.getElementById('download-selected').addEventListener('click', function () {

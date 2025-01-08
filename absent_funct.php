@@ -1,49 +1,68 @@
-<?php
-include ('database.php');
+    <?php
+    include ('database.php');
 
-if (isset($_GET['task']) && $_GET['task'] === 'markAbsent') {
+    if (isset($_GET['task']) && $_GET['task'] === 'markAbsent') {
 
-    // Get the list of all students
-    $sql_get_students = "SELECT student_id FROM student";  
-    $stmt_get_students = $conn->prepare($sql_get_students);
-    $stmt_get_students->execute();
-    $result = $stmt_get_students->get_result();
-    
-    // Loop through each student and check attendance
-    while ($row = $result->fetch_assoc()) {
-        $student_id = $row['student_id'];
-        markAbsentIfNoScan($student_id, $conn);
-    }
-}
-
-// Function to mark the student as absent if no attendance record is found
-function markAbsentIfNoScan($student_id, $conn) {
-    $current_date = date('Y-m-d');  
-
-    // Check if there is an attendance record for this student today
-    $sql_check_attendance = "SELECT * FROM attendance WHERE student_id = ? AND DATE(date) = ?";
-    $stmt_check_attendance = $conn->prepare($sql_check_attendance);
-    $stmt_check_attendance->bind_param("is", $student_id, $current_date);
-    $stmt_check_attendance->execute();
-    $result_check_attendance = $stmt_check_attendance->get_result();
-    
-    // If no attendance record exists for today, mark the student as absent
-    if ($result_check_attendance->num_rows == 0) {
-        // Insert the student as absent for today
-        $sql_absent = "INSERT INTO attendance (student_id, status, date) VALUES (?, 'ABSENT', NOW())";
-        $stmt_absent = $conn->prepare($sql_absent);
-        $stmt_absent->bind_param("i", $student_id);
+        // Get the list of all students
+        $sql_get_students = "SELECT student_id FROM student";  
+        $stmt_get_students = $conn->prepare($sql_get_students);
+        $stmt_get_students->execute();
+        $result = $stmt_get_students->get_result();
         
-        if ($stmt_absent->execute()) {
-            echo json_encode(['status' => 'success', 'message' => 'Student marked as absent.']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Error marking student as absent.']);
+        // Loop through each student and check attendance
+        while ($row = $result->fetch_assoc()) {
+            $student_id = $row['student_id'];
+            markAbsentIfNoScan($student_id, $conn);
         }
-        $stmt_absent->close();
-    } else {
-        echo json_encode(['status' => 'info', 'message' => 'Attendance already recorded for today.']);
     }
 
-    $stmt_check_attendance->close();
-}
-?>
+
+    function markAbsentIfNoScan($student_id, $conn) {
+        $current_date = date('Y-m-d');
+    
+        // Morning attendance check (12:00:00)
+        $sql_check_morning = "
+            SELECT * 
+            FROM attendance 
+            WHERE student_id = ? 
+            AND DATE(date) = ? 
+            AND TIME(date) = '12:00:00'
+        ";
+        $stmt_check_morning = $conn->prepare($sql_check_morning);
+        $stmt_check_morning->bind_param("is", $student_id, $current_date);
+        $stmt_check_morning->execute();
+        $result_morning = $stmt_check_morning->get_result();
+    
+        if ($result_morning->num_rows == 0) {
+            $sql_absent_morning = "INSERT INTO attendance (student_id, status, date) VALUES (?, 'ABSENT', NOW())";
+            $stmt_absent_morning = $conn->prepare($sql_absent_morning);
+            $stmt_absent_morning->bind_param("i", $student_id);
+            $stmt_absent_morning->execute();
+            $stmt_absent_morning->close();
+        }
+    
+        $stmt_check_morning->close();
+        $sql_check_afternoon = "
+            SELECT * 
+            FROM attendance 
+            WHERE student_id = ? 
+            AND DATE(date) = ? 
+            AND TIME(date) = '17:00:00'
+        ";
+        $stmt_check_afternoon = $conn->prepare($sql_check_afternoon);
+        $stmt_check_afternoon->bind_param("is", $student_id, $current_date);
+        $stmt_check_afternoon->execute();
+        $result_afternoon = $stmt_check_afternoon->get_result();
+    
+        if ($result_afternoon->num_rows == 0) {
+            $sql_absent_afternoon = "INSERT INTO attendance (student_id, status, date) VALUES (?, 'ABSENT', NOW())";
+            $stmt_absent_afternoon = $conn->prepare($sql_absent_afternoon);
+            $stmt_absent_afternoon->bind_param("i", $student_id);
+            $stmt_absent_afternoon->execute();
+            $stmt_absent_afternoon->close();
+        }
+    
+        $stmt_check_afternoon->close();
+    }
+    
+    ?>

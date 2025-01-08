@@ -995,25 +995,28 @@ if (isset($_POST['bulkUpdate'])) {
 }
 
 
-
 if (isset($_POST['absent'])) {
     function getAbsentData($conn, $from_date, $to_date) {
         $from_date = $conn->real_escape_string($from_date);
         $to_date = $conn->real_escape_string($to_date);
-        $teacher_id = $_SESSION['teacher_id']; 
-
+        $teacher_id = $_SESSION['teacher_id'];
 
         $query = "SELECT 
-    st.student_id, 
-    CONCAT(
-        st.student_firstname, 
-        ' ', 
-        COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), 
-        '. ', 
-        st.student_lastname
-    ) AS fullname, 
-    COUNT(DISTINCT CASE WHEN a.status = 'ABSENT' THEN a.date END) AS absent_days, 
-    GROUP_CONCAT(DISTINCT CASE WHEN a.status = 'ABSENT' THEN a.date END ORDER BY a.date ASC) AS absent_dates
+        st.student_id, 
+        CONCAT(
+            st.student_firstname, 
+            ' ', 
+            COALESCE(SUBSTRING(st.student_middlename, 1, 1), ''), 
+            '. ', 
+            st.student_lastname
+        ) AS fullname, 
+        COUNT(DISTINCT CASE 
+            WHEN a.status = 'ABSENT' THEN a.date 
+            END) AS absent_days, 
+        GROUP_CONCAT(DISTINCT CASE 
+            WHEN a.status = 'ABSENT' AND TIME(a.date) BETWEEN '07:30:00' AND '12:00:00' THEN CONCAT(DATE(a.date), ' (Morning)') 
+            WHEN a.status = 'ABSENT' AND TIME(a.date) BETWEEN '13:00:00' AND '17:00:00' THEN CONCAT(DATE(a.date), ' (Afternoon)') 
+            END ORDER BY a.date ASC) AS absent_dates
             FROM 
                 student st
             LEFT JOIN 
@@ -1032,10 +1035,8 @@ if (isset($_POST['absent'])) {
             ORDER BY 
                 absent_days DESC";
 
-
         $stmt = $conn->prepare($query);
-        $stmt->bind_param('sss', $from_date, $to_date, $teacher_id); 
-        
+        $stmt->bind_param('sss', $from_date, $to_date, $teacher_id);
 
         $stmt->execute();
         $result = $stmt->get_result();
@@ -1052,12 +1053,11 @@ if (isset($_POST['absent'])) {
         ]);
     }
 
-
     $from_date = $_POST['from'];
     $to_date = $_POST['to'];
-
 
     echo getAbsentData($conn, $from_date, $to_date);
     exit();
 }
+
 
