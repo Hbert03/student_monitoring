@@ -60,15 +60,20 @@ $(document).ready(function () {
                     });
                     return;
                 }
-
+            
                 if (response.success) {
                     Swal.fire({
                         icon: "success",
                         title: "Bulk Enrollment Completed",
-                        text: `students were successfully enrolled.`,
+                        text: `${response.totalEnrolled} students were successfully enrolled.`,
                         showConfirmButton: true,
+                    }).then(() => {
+                        if (response.pdf_url) {
+                            // Trigger download
+                            window.location.href = response.pdf_url;
+                        }
                     });
-
+            
                     $("#bulkFileInput").val("");
                 } else {
                     Swal.fire({
@@ -77,14 +82,8 @@ $(document).ready(function () {
                         text: response.error || "An error occurred during enrollment.",
                     });
                 }
-            },
-            error: function (xhr, status, error) {
-                Swal.fire({
-                    icon: "error",
-                    title: "AJAX Error",
-                    text: error,
-                });
-            },
+            }
+            
         });
     });
 });

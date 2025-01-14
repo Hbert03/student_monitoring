@@ -1,18 +1,25 @@
 <?php
 session_start();
 include ('database.php');
-if (isset($_POST['bulkEnrollment'])) {  
+require_once('phpqrcode/qrlib.php');
+if (isset($_POST['bulkEnrollment'])) {
+    
     if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+        // require('phpqrcode/qrlib.php'); 
         $fileTmpPath = $_FILES['file']['tmp_name'];
-        $fileData = array_map('str_getcsv', file($fileTmpPath)); 
+        $fileData = array_map('str_getcsv', file($fileTmpPath));
         $totalEnrolled = 0;
         $results = []; 
+
+        require('fpdf/fpdf.php'); 
+        $pdf = new FPDF();
+        $pdf->AddPage();
+        $pdf->SetFont('Arial', '', 12);
 
         foreach ($fileData as $index => $row) {
             if ($index === 0) continue; 
             
-          
-            list($firstname, $middlename, $lastname, $studentMobile, $studentAddress, $status, $gender, $gradelevel, $parentName, $parentType, $parentMobile, $email, $address) = $row;
+            list($firstname, $middlename, $lastname, $studentMobile, $studentAddress, $status, $gender, $gradelevel, $parentName, $parentType, $email, $address) = $row;
 
             $query = "SELECT student_id FROM student WHERE student_firstname = ? AND student_middlename = ? AND student_lastname = ?";
             $stmt = $conn->prepare($query);
@@ -26,9 +33,10 @@ if (isset($_POST['bulkEnrollment'])) {
             }
 
             $stmt->close(); 
-            $query = "INSERT INTO parent (parent_name, parent_type, parent_mobile, email, parent_address) VALUES (?, ?, ?, ?, ?)";
+
+            $query = "INSERT INTO parent (parent_name, parent_type, email, parent_address) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("sssss", $parentName, $parentType, $parentMobile, $email, $address);
+            $stmt->bind_param("ssss", $parentName, $parentType, $email, $address);
             if (!$stmt->execute()) {
                 $results[] = ['name' => "$firstname $lastname", 'status' => 'parent_insertion_failed'];
                 continue;
@@ -48,22 +56,61 @@ if (isset($_POST['bulkEnrollment'])) {
 
             $stmt->close();
 
+
             $qrCodeData = json_encode(['id' => $student_id, 'name' => "$firstname $middlename $lastname"]);
-            $qrCodeUrl = "qrcodes/{$student_id}.png";
-            file_put_contents($qrCodeUrl, generateQRCode($qrCodeData)); 
+            $qrCodeUrl = generateQRCodebulk($qrCodeData);
+            
+            if (!file_exists($qrCodeUrl)) {
+                $results[] = ['name' => "$firstname $lastname", 'status' => 'qr_code_generation_failed'];
+                continue;
+            }
+            
+   
+            $pdf->Image($qrCodeUrl, 10, $pdf->GetY(), 30, 30);  
+            $pdf->SetY($pdf->GetY() + 30);  
+            $pdf->Cell(30, 10, $lastname, 0, 1, 'C');  
+            
+ 
             $results[] = ['name' => "$firstname $lastname", 'status' => 'enrolled', 'qrCode' => $qrCodeUrl];
             $totalEnrolled++;
-        }
+            }
+            
 
-        echo json_encode(['success' => true, 'totalEnrolled' => $totalEnrolled, 'results' => $results]);
+            $pdfFilePath = "qrcodes/Enrollment_QRCodes.pdf";
+            $pdf->Output('F', $pdfFilePath); 
+            
+
+            echo json_encode([
+                'success' => true,
+                'totalEnrolled' => $totalEnrolled,
+                'results' => $results,
+                'pdf_url' => $pdfFilePath,
+            ]);
+            
+        
     } else {
         echo json_encode(['success' => false, 'error' => 'Failed to read the file or no file provided']);
     }
 }
 
 
+function generateQRCodebulk($data) {
+    $filePath = 'qrcodes/' . uniqid() . '.png';
+    
+
+    QRcode::png($data, $filePath, QR_ECLEVEL_L, 10); 
+    
+    if (!file_exists($filePath)) {
+        throw new Exception("QR Code generation failed for: $data");
+    }
+    
+    return $filePath;
+}
+
+
+
+
 function generateQRCode($data) {
-    include 'phpqrcode/qrlib.php'; 
     ob_start();
     QRcode::png($data);
     $imageString = ob_get_clean();
@@ -74,7 +121,6 @@ function generateQRCode($data) {
 if (isset($_POST['save'])) {
     $parentName = $_POST['parentname'];
     $parent_type = $_POST['parent_type'];
-    $mobileNumber = $_POST['mobilenumber'];
     $email = $_POST['email'];
     $address = $_POST['address'];
     $firstName = $_POST['firstname'];
@@ -102,12 +148,12 @@ if (isset($_POST['save'])) {
         echo json_encode(['success' => false, 'error' => "Student already exists"]);
     } else {
         // Insert parent details
-        $query = "INSERT INTO parent (parent_name, parent_type, parent_mobile, email, parent_address) VALUES (?, ?, ?, ?, ?)";
+        $query = "INSERT INTO parent (parent_name, parent_type, email, parent_address) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
         if ($stmt === false) {
             die("Error preparing query for parent: " . $conn->error);
         }
-        $stmt->bind_param("sssss", $parentName, $parent_type, $mobileNumber, $email, $address);
+        $stmt->bind_param("ssss", $parentName, $parent_type, $email, $address);
 
         if ($stmt->execute()) {
             $parent_id = $stmt->insert_id;

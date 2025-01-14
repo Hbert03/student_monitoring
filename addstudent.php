@@ -80,7 +80,7 @@ include ('header.php');
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
-                <label for="grade">Grade Level</label>
+                <label for="grade">Gender</label>
                 <select class="form-control gender" id="gender" name="gender" required>
                 </select>
                 
@@ -116,22 +116,23 @@ include ('header.php');
               </div>
             
             </div>
-            <div class="form-row">
-              <div class="form-group col-md-6">
+           <div class="form-row">
+              <!-- <div class="form-group col-md-6">
                 <label for="mobilenumber">Mobile Number <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" placeholder="Mobile Number" required>
+              </div>  -->
+              <div class="form-group col-md-6">
+                <label for="address">Address <span style="color:red">*</span></label>
+                <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
               </div>
               <div class="form-group col-md-6">
                 <label for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
               </div>
             </div>
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="address">Address <span style="color:red">*</span></label>
-                <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
-              </div>
-            </div>
+            <!-- <div class="form-row">
+            
+            </div> -->
           </div>
         </div>
         <!-- Save Button -->
