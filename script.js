@@ -2091,20 +2091,45 @@ $(document).ready(function () {
 document.getElementById('download-selected').addEventListener('click', function () {
     const selectedCheckboxes = document.querySelectorAll('.qrcode-checkbox:checked');
     if (selectedCheckboxes.length === 0) {
-        toastr.error('Please student at least one QR code.');
+        toastr.error('Please select at least one QR code.');
         return;
     }
 
+    // Gather selected student IDs and filenames
+    const selectedData = [];
     selectedCheckboxes.forEach(checkbox => {
-        const fileName = checkbox.getAttribute('data-filename');
-        const link = document.createElement('a');
-        link.href = fileName;
-        link.download = fileName.split('/').pop();
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const studentId = checkbox.getAttribute('data-id');
+        const qrFileName = checkbox.getAttribute('data-filename');
+        selectedData.push({ studentId, qrFileName });
+    });
+
+    // Send selected data to the server for PDF generation
+    $.ajax({
+        url: 'gen_pdf.php',
+        type: 'POST',
+        data: { students: selectedData },
+        success: function (response) {
+            // Decode the base64 response and trigger download
+            var pdfData = atob(response);  // Decode base64 data
+            var byteArray = new Uint8Array(pdfData.length);
+
+            // Convert the base64 string to a byte array
+            for (var i = 0; i < pdfData.length; i++) {
+                byteArray[i] = pdfData.charCodeAt(i);
+            }
+
+            var blob = new Blob([byteArray], { type: 'application/pdf' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'qrcodes.pdf';
+            link.click();
+        },
+        error: function (error) {
+            console.log('Error:', error);
+        }
     });
 });
+
 
 
 
